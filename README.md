@@ -38,6 +38,7 @@ iMessage is the first channel. The architecture is channel-agnostic, with WhatsA
 - 🔐 **Flexible auth** — local email + password (zero config), magic-link email, and Google/GitHub SSO
 - 🎨 **Clean, enterprise UI** — black & white, shadcn/ui + Framer Motion
 - 🚀 **One-click Railway deploy** — almost zero environment variables to set
+- ☁️ **Cloudflare too** — runs on Cloudflare Containers ([guide](deploy/cloudflare/README.md))
 
 ## Deploy to Railway (step by step)
 
@@ -186,6 +187,15 @@ resolve against), so changing it requires a redeploy, not just a restart.
 - **Web crashes on boot with a DB/Redis error** → the variable references didn't resolve. Confirm `Postgres` and `Redis` are the exact service names, and that the three variables are set on the service.
 - **Webhook didn't register when connecting BlueBubbles** → your app needs a public URL BlueBubbles can reach. Make sure you generated a domain (step 4d); then in **Settings → Inboxes** click **Re-register webhook**.
 - **Messages don't arrive / send** → check the **worker** service logs; it must be running with the same three variables as web.
+
+## Deploy to Cloudflare
+
+Comms also runs on [Cloudflare Containers](https://developers.cloudflare.com/containers/): one
+Worker in front of two containers (web and worker) built from the same `Dockerfile`. Postgres and
+Redis come from an outside provider such as Neon and Upstash, and attachments can use R2. The
+marketing site deploys as static assets with no containers.
+
+Full guide: [`deploy/cloudflare/README.md`](deploy/cloudflare/README.md).
 
 ## How the iMessage bridge works
 
