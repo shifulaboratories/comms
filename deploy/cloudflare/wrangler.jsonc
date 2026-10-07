@@ -1,0 +1,48 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "comms",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "observability": { "enabled": true },
+
+  // Both containers are built from the repo's root Dockerfile — the same image
+  // Railway runs. Only the entrypoint differs (see src/index.ts).
+  "containers": [
+    {
+      "class_name": "CommsWeb",
+      "image": "../../Dockerfile",
+      "image_build_context": "../..",
+      // Next.js + the AWS/Anthropic SDKs want more than the 1 GiB of `basic`.
+      "instance_type": "standard-1",
+      "max_instances": 1,
+    },
+    {
+      "class_name": "CommsWorker",
+      "image": "../../Dockerfile",
+      "image_build_context": "../..",
+      "instance_type": "basic",
+      "max_instances": 1,
+    },
+  ],
+  "durable_objects": {
+    "bindings": [
+      { "name": "WEB", "class_name": "CommsWeb" },
+      { "name": "WORKER", "class_name": "CommsWorker" },
+    ],
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["CommsWeb", "CommsWorker"] }],
+
+  // Keeps the queue worker running even when nobody has the inbox open.
+  "triggers": { "crons": ["* * * * *"] },
+
+  // Non-secret config. Secrets (DATABASE_URL, REDIS_URL, APP_SECRET, S3 keys,
+  // SMTP password, OAuth secrets, ANTHROPIC_API_KEY…) go in with
+  // `wrangler secret put <NAME>`. Every var and secret here is forwarded to
+  // both containers as an environment variable.
+  "vars": {
+    // Your public URL, no trailing slash — the workers.dev URL that
+    // `wrangler deploy` prints, or a custom domain. BlueBubbles webhooks and
+    // sign-in links are built from it.
+    "APP_URL": "",
+  },
+}

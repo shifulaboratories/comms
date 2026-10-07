@@ -1,0 +1,13 @@
+{
+  // The marketing site on Cloudflare: a static export served as Workers static
+  // assets — no Worker script, no Node runtime. Build and deploy with
+  //   pnpm --filter @comms/www deploy:cloudflare
+  // NEXT_PUBLIC_SITE_URL is inlined at build time, so set it in the shell (or
+  // the Workers Builds build variables) before building.
+  "name": "comms-www",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./out",
+    "not_found_handling": "404-page",
+  },
+}
