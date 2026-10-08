@@ -50,13 +50,28 @@ const GROUPS: { title: string; items: NavItem[] }[] = [
   {
     title: 'Workspace',
     items: [
-      { href: '/settings/workspace', label: 'General', icon: Building2, permission: 'workspace.manage' },
-      { href: '/settings/inboxes', label: 'Inboxes & Channels', icon: Radio, permission: 'inboxes.manage' },
+      {
+        href: '/settings/workspace',
+        label: 'General',
+        icon: Building2,
+        permission: 'workspace.manage',
+      },
+      {
+        href: '/settings/inboxes',
+        label: 'Inboxes & Channels',
+        icon: Radio,
+        permission: 'inboxes.manage',
+      },
       { href: '/settings/team', label: 'People', icon: Users, permission: 'users.manage' },
       { href: '/settings/roles', label: 'Roles', icon: ShieldCheck, permission: 'roles.manage' },
       { href: '/settings/tags', label: 'Tags', icon: Tag, permission: 'workspace.manage' },
       { href: '/settings/macros', label: 'Macros', icon: Sparkles, permission: 'workspace.manage' },
-      { href: '/settings/automations', label: 'Automations', icon: Zap, permission: 'automations.manage' },
+      {
+        href: '/settings/automations',
+        label: 'Automations',
+        icon: Zap,
+        permission: 'automations.manage',
+      },
     ],
   },
   {
@@ -74,8 +89,10 @@ export function SettingsNav({ permissions }: { permissions: string[] }) {
   const granted = (permission?: string) =>
     !permission || permissions.includes('*') || permissions.includes(permission);
 
-  const groups = GROUPS.map((g) => ({ ...g, items: g.items.filter((i) => granted(i.permission)) }))
-    .filter((g) => g.items.length > 0);
+  const groups = GROUPS.map((g) => ({
+    ...g,
+    items: g.items.filter((i) => granted(i.permission)),
+  })).filter((g) => g.items.length > 0);
 
   return (
     <nav aria-label="Settings">
@@ -83,9 +100,7 @@ export function SettingsNav({ permissions }: { permissions: string[] }) {
       <div className="hidden md:block">
         {groups.map((group) => (
           <div key={group.title} className="mb-4 last:mb-0">
-            <p className="px-2.5 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
-              {group.title}
-            </p>
+            <p className="type-micro text-muted-foreground/70 px-2.5 pb-1">{group.title}</p>
             <div className="space-y-0.5">
               {group.items.map((item) => (
                 <Link
@@ -95,7 +110,7 @@ export function SettingsNav({ permissions }: { permissions: string[] }) {
                   className={cn(
                     'flex items-center gap-2.5 rounded-lg px-2.5 py-[7px] text-[13px] transition-colors',
                     isActive(item.href)
-                      ? 'bg-brand-muted font-medium text-brand'
+                      ? 'bg-accent text-foreground shadow-xs ring-border-strong/60 font-medium ring-1 ring-inset'
                       : 'text-muted-foreground hover:bg-accent hover:text-foreground',
                   )}
                 >
@@ -110,23 +125,25 @@ export function SettingsNav({ permissions }: { permissions: string[] }) {
 
       {/* Narrow: one scrollable row. Group labels are dropped — on a phone the
           row is swiped, and the labels would eat the width the entries need. */}
-      <div className="-mx-4 flex gap-1 overflow-x-auto border-b px-4 pb-2 md:hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {groups.flatMap((g) => g.items).map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            aria-current={isActive(item.href) ? 'page' : undefined}
-            className={cn(
-              'flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-[12.5px] transition-colors',
-              isActive(item.href)
-                ? 'bg-brand-muted font-medium text-brand'
-                : 'text-muted-foreground hover:bg-accent hover:text-foreground',
-            )}
-          >
-            <item.icon className="h-3.5 w-3.5 shrink-0" />
-            {item.label}
-          </Link>
-        ))}
+      <div className="-mx-4 flex gap-1 overflow-x-auto border-b px-4 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] md:hidden [&::-webkit-scrollbar]:hidden">
+        {groups
+          .flatMap((g) => g.items)
+          .map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              aria-current={isActive(item.href) ? 'page' : undefined}
+              className={cn(
+                'flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-[12.5px] transition-colors',
+                isActive(item.href)
+                  ? 'bg-accent text-foreground shadow-xs ring-border-strong/60 font-medium ring-1 ring-inset'
+                  : 'text-muted-foreground hover:bg-accent hover:text-foreground',
+              )}
+            >
+              <item.icon className="h-3.5 w-3.5 shrink-0" />
+              {item.label}
+            </Link>
+          ))}
       </div>
     </nav>
   );

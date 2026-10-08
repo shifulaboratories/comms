@@ -3,133 +3,130 @@
 @tailwind utilities;
 
 /*
- * Comms design system — strict monochrome.
+ * Comms design system — quiet charcoal, one blue.
  *
- * No accent hue anywhere in the chrome: black is the accent. Active states,
- * buttons, focus rings, unread markers, and outbound bubbles are all ink
- * (near-black on white; white on black in dark mode). The only color left in
- * the product is semantic and small: red for failure/overdue, green for
- * connected/success, amber for warnings and internal notes — signals, not
- * decoration.
+ * Modelled on the "AI-native" interface language (beautifului.dev): a soft
+ * charcoal canvas rather than true black, cards that sit one step above it,
+ * inner panels one step above those, hairline borders, and a single accent —
+ * iMessage blue — reserved for the things that act: the primary button, the
+ * send, the outbound bubble, focus and selection. Everything else is a
+ * neutral step on the same cool-grey ramp.
  *
- * `--brand` is retained as a token name (every component references it) but is
- * now an alias for ink. Dark mode is true black: #000 canvas, near-black
- * surfaces, so OLED screens actually turn off.
+ * Colour stays semantic and small elsewhere: red for failure/overdue, green
+ * for connected/success, amber for warnings and internal notes.
  */
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 240 6.7% 97.1%;
     --surface: 0 0% 100%;
-    --surface-sunken: 0 0% 97.6%;
+    --surface-sunken: 240 7.7% 94.9%;
 
-    --foreground: 0 0% 5%;
+    --foreground: 220 6.1% 9.6%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 5%;
+    --card-foreground: 220 6.1% 9.6%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 5%;
+    --popover-foreground: 220 6.1% 9.6%;
 
-    --primary: 0 0% 7%;
+    --primary: 212 100% 52%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 95.5%;
-    --secondary-foreground: 0 0% 10%;
+    --secondary: 240 6% 93.5%;
+    --secondary-foreground: 220 6.1% 12%;
 
-    --muted: 0 0% 95.5%;
-    --muted-foreground: 0 0% 44%;
+    --muted: 240 6% 94%;
+    --muted-foreground: 222 5.7% 44.5%;
 
-    --accent: 0 0% 95%;
-    --accent-foreground: 0 0% 10%;
+    --accent: 240 6% 94%;
+    --accent-foreground: 220 6.1% 12%;
 
-    /* Ink "accent" — alias of primary, kept for component compatibility. */
-    --brand: 0 0% 7%;
+    --brand: 212 100% 52%;
     --brand-foreground: 0 0% 100%;
-    --brand-muted: 0 0% 94.5%;
-    --brand-border: 0 0% 85%;
+    --brand-muted: 214 100% 95.9%;
+    --brand-border: 214 90% 84%;
 
-    --destructive: 0 65% 48%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --destructive-muted: 0 70% 97%;
+    --destructive-muted: 0 86% 97%;
 
-    --success: 152 45% 38%;
+    --success: 152 55% 36%;
     --success-foreground: 0 0% 100%;
-    --success-muted: 152 40% 96%;
+    --success-muted: 152 50% 95%;
 
-    --warning: 35 80% 44%;
+    --warning: 35 85% 42%;
     --warning-foreground: 0 0% 100%;
-    --warning-muted: 40 75% 96%;
+    --warning-muted: 40 85% 95%;
 
-    --border: 0 0% 90.5%;
-    --border-strong: 0 0% 83%;
-    --input: 0 0% 88%;
-    --ring: 0 0% 7%;
+    --border: 240 6.4% 90.8%;
+    --border-strong: 240 5.1% 84.7%;
+    --input: 240 6% 88%;
+    --ring: 212 100% 52%;
 
-    --radius: 0.65rem;
+    --radius: 0.75rem;
 
-    --shadow-xs: 0 1px 2px -1px hsl(0 0% 0% / 0.06);
-    --shadow-sm: 0 1px 2px -1px hsl(0 0% 0% / 0.07), 0 1px 1px -1px hsl(0 0% 0% / 0.04);
-    --shadow-md: 0 4px 8px -3px hsl(0 0% 0% / 0.08), 0 2px 4px -2px hsl(0 0% 0% / 0.05);
-    --shadow-lg: 0 12px 24px -8px hsl(0 0% 0% / 0.12), 0 4px 8px -4px hsl(0 0% 0% / 0.06);
-    --shadow-xl: 0 24px 48px -12px hsl(0 0% 0% / 0.18), 0 8px 16px -8px hsl(0 0% 0% / 0.08);
-    --shadow-brand: var(--shadow-md);
+    --shadow-xs: 0 1px 2px -1px hsl(220 10% 10% / 0.06);
+    --shadow-sm: 0 1px 2px -1px hsl(220 10% 10% / 0.08), 0 1px 1px -1px hsl(220 10% 10% / 0.04);
+    --shadow-md: 0 6px 12px -6px hsl(220 10% 10% / 0.1), 0 2px 4px -2px hsl(220 10% 10% / 0.05);
+    --shadow-lg: 0 16px 32px -12px hsl(220 10% 10% / 0.16), 0 4px 8px -4px hsl(220 10% 10% / 0.06);
+    --shadow-xl: 0 28px 56px -16px hsl(220 10% 10% / 0.22), 0 8px 16px -8px hsl(220 10% 10% / 0.08);
+    --shadow-brand: 0 6px 16px -6px hsl(212 100% 52% / 0.45);
   }
 
   .dark {
-    /* True black. The canvas is #000; surfaces lift barely above it. */
-    --background: 0 0% 0%;
-    --surface: 0 0% 4.5%;
-    --surface-sunken: 0 0% 2.5%;
+    /* Charcoal, not black: the canvas, a card one step up, a panel one more. */
+    --background: 220 6.1% 9.6%;
+    --surface: 220 5.1% 11.6%;
+    --surface-sunken: 220 6.5% 8.4%;
 
-    --foreground: 0 0% 96%;
+    --foreground: 210 8.3% 95.3%;
 
-    --card: 0 0% 4.5%;
-    --card-foreground: 0 0% 96%;
+    --card: 220 5.1% 11.6%;
+    --card-foreground: 210 8.3% 95.3%;
 
-    --popover: 0 0% 6%;
-    --popover-foreground: 0 0% 96%;
+    --popover: 225 5.4% 14.5%;
+    --popover-foreground: 210 8.3% 95.3%;
 
-    --primary: 0 0% 100%;
-    --primary-foreground: 0 0% 5%;
+    --primary: 211 100% 62%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 11%;
-    --secondary-foreground: 0 0% 96%;
+    --secondary: 225 5.4% 14.5%;
+    --secondary-foreground: 210 8.3% 95.3%;
 
-    --muted: 0 0% 10%;
-    --muted-foreground: 0 0% 58%;
+    --muted: 225 5.4% 14.5%;
+    --muted-foreground: 220 5.5% 56.9%;
 
-    --accent: 0 0% 12%;
-    --accent-foreground: 0 0% 96%;
+    --accent: 225 4.5% 17.3%;
+    --accent-foreground: 210 8.3% 95.3%;
 
-    --brand: 0 0% 100%;
-    --brand-foreground: 0 0% 5%;
-    --brand-muted: 0 0% 11%;
-    --brand-border: 0 0% 24%;
+    --brand: 211 100% 62%;
+    --brand-foreground: 0 0% 100%;
+    --brand-muted: 214 34.1% 17.3%;
+    --brand-border: 213 60% 32%;
 
-    --destructive: 0 60% 55%;
+    --destructive: 0 72% 62%;
     --destructive-foreground: 0 0% 100%;
-    --destructive-muted: 0 45% 12%;
+    --destructive-muted: 0 30% 15%;
 
-    --success: 152 40% 48%;
-    --success-foreground: 0 0% 5%;
-    --success-muted: 152 35% 10%;
+    --success: 145 55% 52%;
+    --success-foreground: 220 6.1% 9.6%;
+    --success-muted: 150 25% 13%;
 
-    --warning: 38 75% 55%;
-    --warning-foreground: 0 0% 5%;
-    --warning-muted: 38 45% 11%;
+    --warning: 38 90% 60%;
+    --warning-foreground: 220 6.1% 9.6%;
+    --warning-muted: 38 30% 13%;
 
-    --border: 0 0% 13.5%;
-    --border-strong: 0 0% 22%;
-    --input: 0 0% 15%;
-    --ring: 0 0% 100%;
+    --border: 225 4.5% 17.3%;
+    --border-strong: 228 4.4% 22.2%;
+    --input: 228 4.4% 20%;
+    --ring: 211 100% 62%;
 
-    /* On true black, shadows barely read — borders do the separating. */
-    --shadow-xs: 0 1px 2px -1px hsl(0 0% 0% / 0.6);
-    --shadow-sm: 0 1px 2px -1px hsl(0 0% 0% / 0.7);
-    --shadow-md: 0 4px 10px -4px hsl(0 0% 0% / 0.8);
-    --shadow-lg: 0 12px 28px -10px hsl(0 0% 0% / 0.9);
-    --shadow-xl: 0 24px 48px -12px hsl(0 0% 0% / 0.9);
-    --shadow-brand: var(--shadow-md);
+    --shadow-xs: 0 1px 2px -1px hsl(0 0% 0% / 0.5);
+    --shadow-sm: 0 1px 2px -1px hsl(0 0% 0% / 0.55), inset 0 1px 0 hsl(0 0% 100% / 0.03);
+    --shadow-md: 0 6px 14px -6px hsl(0 0% 0% / 0.6), inset 0 1px 0 hsl(0 0% 100% / 0.03);
+    --shadow-lg: 0 16px 32px -12px hsl(0 0% 0% / 0.7), inset 0 1px 0 hsl(0 0% 100% / 0.04);
+    --shadow-xl: 0 28px 56px -16px hsl(0 0% 0% / 0.75), inset 0 1px 0 hsl(0 0% 100% / 0.04);
+    --shadow-brand: 0 6px 18px -6px hsl(211 100% 62% / 0.5);
   }
 }
 
@@ -158,12 +155,12 @@
   }
 
   ::selection {
-    background-color: hsl(var(--foreground) / 0.14);
+    background-color: hsl(var(--brand) / 0.28);
   }
 
   /* One consistent focus treatment across every interactive element. */
   :focus-visible {
-    @apply outline-none ring-2 ring-ring/50 ring-offset-2 ring-offset-background;
+    @apply ring-ring/50 ring-offset-background outline-none ring-2 ring-offset-2;
   }
 
   ::-webkit-scrollbar {
@@ -174,7 +171,7 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    @apply rounded-full border-[3px] border-solid border-transparent bg-border-strong;
+    @apply bg-border-strong rounded-full border-[3px] border-solid border-transparent;
     background-clip: content-box;
   }
   ::-webkit-scrollbar-thumb:hover {
@@ -231,11 +228,10 @@
     letter-spacing: 0;
   }
   .type-micro {
-    font-size: 0.65625rem; /* 10.5px — section labels */
+    font-size: 0.75rem; /* 12px — section labels, sentence case and quiet */
     line-height: 1.25;
-    letter-spacing: 0.065em;
-    font-weight: 600;
-    text-transform: uppercase;
+    letter-spacing: -0.003em;
+    font-weight: 500;
   }
 
   /*
@@ -248,6 +244,31 @@
     padding-right: 0.625rem;
   }
 
+  /*
+   * Segmented control: a rounded tray with a raised pill that slides between
+   * options (the pill is a motion layoutId span carrying .seg-pill).
+   */
+  .seg {
+    @apply bg-muted ring-border/70 flex items-center gap-0.5 rounded-full p-[3px] ring-1 ring-inset;
+  }
+  .seg-item {
+    @apply relative rounded-full px-2.5 py-1 text-center text-[12px] font-medium transition-colors duration-150;
+  }
+  .seg-pill {
+    @apply bg-surface shadow-xs ring-border dark:bg-accent dark:ring-border-strong/80 absolute inset-0 rounded-full ring-1 ring-inset;
+  }
+
+  /* A raised inner panel inside a card — the second step on the ramp. */
+  .panel {
+    @apply bg-surface shadow-xs dark:bg-secondary rounded-xl border;
+  }
+
+  /* Dotted canvas behind node graphs (automations), as in a flowchart editor. */
+  .canvas-dots {
+    background-image: radial-gradient(hsl(var(--foreground) / 0.12) 1px, transparent 1px);
+    background-size: 16px 16px;
+  }
+
   /* Hairline that fades at both ends — softer than a full-bleed 1px border. */
   .divider-fade {
     background: linear-gradient(
@@ -257,6 +278,21 @@
       hsl(var(--border)) 85%,
       transparent
     );
+  }
+
+  /* A highlight sweeping across text — the "model is working" verb. */
+  .text-shimmer {
+    background: linear-gradient(
+        100deg,
+        hsl(var(--muted-foreground)) 35%,
+        hsl(var(--foreground)) 50%,
+        hsl(var(--muted-foreground)) 65%
+      )
+      0 0 / 250% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    @apply animate-text-shimmer;
   }
 
   /* Loading placeholder sweep. */

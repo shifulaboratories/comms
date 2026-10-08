@@ -12,6 +12,8 @@ import {
   Check,
   X,
   Zap,
+  MessageSquarePlus,
+  MessagesSquare,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -67,9 +69,10 @@ function describeRule(
   if (r.conditions.priorityIn?.length) conds.push(`priority ${r.conditions.priorityIn.join('/')}`);
   if (r.conditions.kindIn?.length) conds.push(`from ${r.conditions.kindIn.join('/')}`);
   if (r.conditions.contactIs)
-    conds.push(r.conditions.contactIs === 'first_time' ? 'first-time contact' : 'returning contact');
-  if (r.conditions.businessHours)
-    conds.push(`${r.conditions.businessHours} business hours`);
+    conds.push(
+      r.conditions.contactIs === 'first_time' ? 'first-time contact' : 'returning contact',
+    );
+  if (r.conditions.businessHours) conds.push(`${r.conditions.businessHours} business hours`);
   if (r.conditions.hasTagIds?.length) {
     const names = r.conditions.hasTagIds
       .map((id) => allTags.find((t) => t.id === id)?.name)
@@ -91,6 +94,131 @@ function describeRule(
   if (r.actions.slaMinutes) acts.push(`SLA ${r.actions.slaMinutes}m`);
 
   return `${conds.length ? `When ${conds.join(' and ')}` : 'Always'} → ${acts.join(', ') || 'nothing'}`;
+}
+
+type Chip = { label: string; value?: string; tone?: 'brand' | 'warning' | 'muted' };
+
+/** The same facts as describeRule, as chips for the flow view. */
+function ruleParts(
+  r: Rule,
+  agents: { id: string; name: string | null; email: string }[],
+  allTags: { id: string; name: string }[],
+  inboxes: { id: string; name: string }[],
+): { conds: Chip[]; acts: Chip[] } {
+  const c = r.conditions;
+  const conds: Chip[] = [];
+  if (c.bodyContains?.length)
+    conds.push({ label: 'message contains', value: c.bodyContains.join(' · ') });
+  if (c.inboxId)
+    conds.push({
+      label: 'channel is',
+      value: inboxes.find((i) => i.id === c.inboxId)?.name ?? 'a channel',
+    });
+  if (c.priorityIn?.length) conds.push({ label: 'priority is', value: c.priorityIn.join(' / ') });
+  if (c.kindIn?.length) conds.push({ label: 'sender is', value: c.kindIn.join(' / ') });
+  if (c.contactIs)
+    conds.push({
+      label: 'contact is',
+      value: c.contactIs === 'first_time' ? 'first-time' : 'returning',
+    });
+  if (c.businessHours) conds.push({ label: 'time is', value: `${c.businessHours} business hours` });
+  if (c.hasTagIds?.length)
+    conds.push({
+      label: 'tagged',
+      value: c.hasTagIds
+        .map((id) => allTags.find((t) => t.id === id)?.name)
+        .filter(Boolean)
+        .join(', '),
+    });
+
+  const a = r.actions;
+  const acts: Chip[] = [];
+  if (a.setStatus) acts.push({ label: 'set status', value: a.setStatus });
+  if (a.setPriority)
+    acts.push({
+      label: 'priority',
+      value: a.setPriority,
+      tone: a.setPriority === 'urgent' || a.setPriority === 'high' ? 'warning' : undefined,
+    });
+  if (a.assignToUserId) {
+    const ag = agents.find((x) => x.id === a.assignToUserId);
+    acts.push({ label: 'assign', value: ag?.name ?? ag?.email ?? 'agent', tone: 'brand' });
+  }
+  if (a.addTagIds?.length)
+    acts.push({
+      label: 'tag',
+      value:
+        a.addTagIds
+          .map((id) => allTags.find((t) => t.id === id)?.name)
+          .filter(Boolean)
+          .join(', ') || `${a.addTagIds.length}`,
+    });
+  if (a.autoReply)
+    acts.push({
+      label: 'auto-reply',
+      value: `“${a.autoReply.length > 48 ? `${a.autoReply.slice(0, 48)}…` : a.autoReply}”`,
+      tone: 'brand',
+    });
+  if (a.mute) acts.push({ label: 'mute', tone: 'muted' });
+  if (a.snoozeMinutes) acts.push({ label: 'snooze', value: `${a.snoozeMinutes}m` });
+  if (a.slaMinutes) acts.push({ label: 'SLA', value: `${a.slaMinutes}m` });
+  return { conds, acts };
+}
+
+function FlowChip({ chip }: { chip: Chip }) {
+  return (
+    <span className="bg-surface shadow-xs dark:bg-accent/70 inline-flex max-w-full items-start gap-1.5 rounded-lg border px-2 py-1 text-[12px] leading-snug">
+      <span className="text-muted-foreground shrink-0">{chip.label}</span>
+      {chip.value && (
+        <span
+          className={cn(
+            'flex min-w-0 items-baseline gap-1 font-medium',
+            chip.tone === 'brand' && 'text-brand',
+            chip.tone === 'warning' && 'text-warning',
+          )}
+        >
+          <span
+            className={cn(
+              'h-1.5 w-1.5 shrink-0 translate-y-[-1px] self-center rounded-full',
+              chip.tone === 'brand'
+                ? 'bg-brand'
+                : chip.tone === 'warning'
+                  ? 'bg-warning'
+                  : 'bg-muted-foreground/60',
+            )}
+          />
+          <span className="break-words">{chip.value}</span>
+        </span>
+      )}
+    </span>
+  );
+}
+
+/** One labelled node in the rule's flow: a coloured tag above a card. */
+function FlowNode({
+  tag,
+  tone,
+  children,
+}: {
+  tag: string;
+  tone: 'violet' | 'amber' | 'blue';
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="relative">
+      <span
+        className={cn(
+          'mb-1.5 inline-block rounded-md px-1.5 py-0.5 text-[11px] font-medium',
+          tone === 'violet' && 'bg-[hsl(258_90%_66%/0.14)] text-[hsl(258_90%_72%)]',
+          tone === 'amber' && 'bg-warning-muted text-warning',
+          tone === 'blue' && 'bg-brand-muted text-brand',
+        )}
+      >
+        {tag}
+      </span>
+      <div className="panel flex flex-wrap items-center gap-1.5 p-2.5">{children}</div>
+    </div>
+  );
 }
 
 export function AutomationManager({
@@ -155,7 +283,10 @@ export function AutomationManager({
 
   function submit() {
     const conditions: RuleConditions = {
-      bodyContains: keywords.split(',').map((k) => k.trim()).filter(Boolean),
+      bodyContains: keywords
+        .split(',')
+        .map((k) => k.trim())
+        .filter(Boolean),
     };
     if (condInbox !== ANY) conditions.inboxId = condInbox;
     if (condPriority !== ANY) conditions.priorityIn = [condPriority as never];
@@ -204,13 +335,13 @@ export function AutomationManager({
       {/* ---- Existing rules ---- */}
       <div className="space-y-2">
         {rules.length === 0 ? (
-          <p className="rounded-xl border border-dashed p-6 text-center text-sm text-muted-foreground">
+          <p className="text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
             No automations yet. Rules run top to bottom when a message arrives.
           </p>
         ) : (
           rules.map((r, i) => (
-            <div key={r.id} className="rounded-xl border bg-surface p-3.5 shadow-xs">
-              <div className="flex items-start gap-3">
+            <div key={r.id} className="bg-surface shadow-xs overflow-hidden rounded-2xl border">
+              <div className="flex items-start gap-3 p-3.5">
                 <Switch
                   checked={r.enabled}
                   onCheckedChange={(v) =>
@@ -225,20 +356,17 @@ export function AutomationManager({
                     <span className={cn('text-[13.5px] font-medium', !r.enabled && 'opacity-50')}>
                       {r.name}
                     </span>
-                    <span className="rounded bg-secondary px-1.5 py-px text-[10.5px] text-muted-foreground">
-                      {r.trigger === 'conversation_created' ? 'new conversation' : 'every message'}
+                    <span className="tabular text-muted-foreground rounded-md border px-1.5 font-mono text-[10.5px]">
+                      {String(i + 1).padStart(2, '0')}
                     </span>
                     {r.stopProcessing && (
-                      <span className="rounded bg-secondary px-1.5 py-px text-[10.5px] text-muted-foreground">
+                      <span className="text-muted-foreground rounded-md border border-dashed px-1.5 py-px text-[10.5px]">
                         stops chain
                       </span>
                     )}
                   </div>
-                  <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
-                    {describeRule(r, agents, allTags)}
-                  </p>
                   {/* Run log — a rule that fires invisibly is a rule nobody trusts. */}
-                  <p className="mt-1 text-[11px] text-muted-foreground/80">
+                  <p className="text-muted-foreground/80 mt-1 text-[11px]">
                     {r.fireCount > 0 ? (
                       <>
                         Fired <span className="tabular font-medium">{r.fireCount}</span>{' '}
@@ -260,7 +388,7 @@ export function AutomationManager({
                         router.refresh();
                       })
                     }
-                    className="rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-25"
+                    className="text-muted-foreground hover:bg-accent hover:text-foreground rounded p-1 transition-colors disabled:opacity-25"
                     aria-label="Move up"
                   >
                     <ChevronUp className="h-3.5 w-3.5" />
@@ -273,7 +401,7 @@ export function AutomationManager({
                         router.refresh();
                       })
                     }
-                    className="rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-25"
+                    className="text-muted-foreground hover:bg-accent hover:text-foreground rounded p-1 transition-colors disabled:opacity-25"
                     aria-label="Move down"
                   >
                     <ChevronDown className="h-3.5 w-3.5" />
@@ -286,13 +414,66 @@ export function AutomationManager({
                         router.refresh();
                       })
                     }
-                    className="rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-destructive"
+                    className="text-muted-foreground hover:bg-accent hover:text-destructive rounded p-1 transition-colors"
                     aria-label="Delete rule"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 </div>
               </div>
+              {(() => {
+                const { conds, acts } = ruleParts(r, agents, allTags, inboxes);
+                return (
+                  <div
+                    aria-label={describeRule(r, agents, allTags)}
+                    className={cn(
+                      'canvas-dots border-border-strong bg-surface-sunken/60 border-t border-dashed px-4 py-4 transition-opacity',
+                      !r.enabled && 'opacity-50',
+                    )}
+                  >
+                    <div className="grid gap-x-3 gap-y-2 md:grid-cols-[auto_auto_minmax(0,1fr)_auto_minmax(0,1.25fr)] md:items-end">
+                      <FlowNode tag="Trigger" tone="violet">
+                        <span className="flex items-center gap-2 whitespace-nowrap text-[12.5px] font-medium">
+                          <span className="grid h-6 w-6 place-items-center rounded-md bg-[hsl(258_90%_66%/0.14)] text-[hsl(258_90%_72%)]">
+                            {r.trigger === 'conversation_created' ? (
+                              <MessageSquarePlus className="h-3.5 w-3.5" />
+                            ) : (
+                              <MessagesSquare className="h-3.5 w-3.5" />
+                            )}
+                          </span>
+                          {r.trigger === 'conversation_created'
+                            ? 'New conversation'
+                            : 'Every message'}
+                        </span>
+                      </FlowNode>
+                      <span
+                        aria-hidden
+                        className="border-muted-foreground/40 mb-[22px] hidden h-px w-6 border-t border-dashed md:block"
+                      />
+                      <FlowNode tag="If" tone="amber">
+                        {conds.length ? (
+                          conds.map((c) => <FlowChip key={c.label} chip={c} />)
+                        ) : (
+                          <span className="text-muted-foreground px-1 text-[12px]">Always</span>
+                        )}
+                      </FlowNode>
+                      <span
+                        aria-hidden
+                        className="border-muted-foreground/40 mb-[22px] hidden h-px w-6 border-t border-dashed md:block"
+                      />
+                      <FlowNode tag="Then" tone="blue">
+                        {acts.length ? (
+                          acts.map((c) => <FlowChip key={c.label} chip={c} />)
+                        ) : (
+                          <span className="text-muted-foreground px-1 text-[12px]">
+                            Nothing yet
+                          </span>
+                        )}
+                      </FlowNode>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           ))
         )}
@@ -300,12 +481,12 @@ export function AutomationManager({
 
       {/* ---- Dry-run tester ---- */}
       {rules.length > 0 && (
-        <div className="rounded-xl border bg-surface-sunken p-3.5">
+        <div className="bg-surface-sunken rounded-xl border p-3.5">
           <p className="flex items-center gap-1.5 text-[12.5px] font-medium">
             <FlaskConical className="h-3.5 w-3.5" />
             Test your rules
           </p>
-          <p className="mt-0.5 text-[11.5px] text-muted-foreground">
+          <p className="text-muted-foreground mt-0.5 text-[11.5px]">
             Paste a sample message to see which rules would fire. Nothing is sent or changed.
           </p>
           <div className="mt-2.5 flex gap-2">
@@ -317,31 +498,36 @@ export function AutomationManager({
                 if (e.key === 'Enter') runTest();
               }}
             />
-            <Button variant="outline" onClick={runTest} loading={pending} disabled={!testBody.trim()}>
+            <Button
+              variant="outline"
+              onClick={runTest}
+              loading={pending}
+              disabled={!testBody.trim()}
+            >
               Test
             </Button>
           </div>
           {testResults && (
             <div className="mt-3 space-y-1">
               {testResults.length === 0 ? (
-                <p className="text-[12px] text-muted-foreground">
+                <p className="text-muted-foreground text-[12px]">
                   No enabled rules for this trigger.
                 </p>
               ) : (
                 testResults.map((r) => (
                   <div
                     key={r.ruleId}
-                    className="flex items-start gap-2 rounded-lg bg-surface px-2.5 py-1.5 text-[12px]"
+                    className="bg-surface flex items-start gap-2 rounded-lg px-2.5 py-1.5 text-[12px]"
                   >
                     {r.matched ? (
-                      <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-success" />
+                      <Check className="text-success mt-0.5 h-3.5 w-3.5 shrink-0" />
                     ) : (
-                      <X className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground/50" />
+                      <X className="text-muted-foreground/50 mt-0.5 h-3.5 w-3.5 shrink-0" />
                     )}
                     <span className={cn('font-medium', !r.matched && 'text-muted-foreground')}>
                       {r.ruleName}
                     </span>
-                    <span className="ml-auto text-right text-[11px] text-muted-foreground">
+                    <span className="text-muted-foreground ml-auto text-right text-[11px]">
                       {r.reason}
                       {r.stoppedChain && ' · stops chain'}
                     </span>
@@ -360,7 +546,7 @@ export function AutomationManager({
           New automation
         </Button>
       ) : (
-        <div className="space-y-4 rounded-xl border bg-surface p-4 shadow-xs">
+        <div className="bg-surface shadow-xs space-y-4 rounded-xl border p-4">
           <div className="space-y-1.5">
             <Label className="text-[12.5px]">Name</Label>
             <Input
@@ -385,10 +571,8 @@ export function AutomationManager({
           </div>
 
           {/* Conditions */}
-          <div className="space-y-3 rounded-lg border bg-surface-sunken p-3">
-            <p className="text-[10.5px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
-              When — all must match
-            </p>
+          <div className="bg-surface-sunken space-y-3 rounded-lg border p-3">
+            <p className="type-micro text-muted-foreground">When — all must match</p>
             <div className="space-y-1.5">
               <Label className="text-[12px]">Message contains (comma-separated, any match)</Label>
               <Input
@@ -476,10 +660,8 @@ export function AutomationManager({
           </div>
 
           {/* Actions */}
-          <div className="space-y-3 rounded-lg border bg-surface-sunken p-3">
-            <p className="text-[10.5px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
-              Then
-            </p>
+          <div className="bg-surface-sunken space-y-3 rounded-lg border p-3">
+            <p className="type-micro text-muted-foreground">Then</p>
             <div className="grid gap-2.5 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label className="text-[12px]">Set status</Label>
@@ -590,7 +772,7 @@ export function AutomationManager({
                 placeholder="Thanks {{contact.first_name}} — we're closed right now and will reply first thing tomorrow."
                 className="text-[13px]"
               />
-              <p className="text-[11px] text-muted-foreground">
+              <p className="text-muted-foreground text-[11px]">
                 Supports the same {'{{variables}}'} as macros. Sent at most once per hour per
                 conversation, and never to a contact who replied STOP.
               </p>

@@ -108,7 +108,7 @@ export function NewConversation({ inboxes = [] }: { inboxes?: ComposeInbox[] }) 
         {!picked ? (
           <>
             <div className="flex items-center gap-2.5 border-b px-3.5">
-              <Search className="h-[15px] w-[15px] shrink-0 text-muted-foreground" />
+              <Search className="text-muted-foreground h-[15px] w-[15px] shrink-0" />
               <input
                 autoFocus
                 value={query}
@@ -126,12 +126,12 @@ export function NewConversation({ inboxes = [] }: { inboxes?: ComposeInbox[] }) 
                   }
                 }}
                 placeholder="Name, phone number, or email…"
-                className="h-[52px] w-full bg-transparent text-[13.5px] outline-none placeholder:text-muted-foreground/70"
+                className="placeholder:text-muted-foreground/70 h-[52px] w-full bg-transparent text-[13.5px] outline-none"
               />
             </div>
             <div className="max-h-72 overflow-y-auto p-1.5">
               {results.length === 0 ? (
-                <p className="px-3 py-8 text-center text-[13px] text-muted-foreground">
+                <p className="text-muted-foreground px-3 py-8 text-center text-[13px]">
                   {query.trim().length < 2
                     ? 'Search your contacts, or type a phone number.'
                     : 'No matches — type a full phone number or email to message someone new.'}
@@ -148,18 +148,20 @@ export function NewConversation({ inboxes = [] }: { inboxes?: ComposeInbox[] }) 
                     )}
                   >
                     <Avatar className="h-7 w-7">
-                      <AvatarFallback className="bg-secondary text-[10px] font-semibold">
+                      <AvatarFallback className="text-[10px] font-semibold">
                         {r.contactId ? initials(r.name) : <User className="h-3 w-3" />}
                       </AvatarFallback>
                     </Avatar>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-[13px] font-medium">{r.name}</span>
-                      <span className="block truncate font-mono text-[11px] text-muted-foreground">
+                      <span className="text-muted-foreground block truncate font-mono text-[11px]">
                         {r.address}
                       </span>
                     </span>
                     {r.hasConversation && (
-                      <span className="shrink-0 text-[11px] text-muted-foreground">open thread</span>
+                      <span className="text-muted-foreground shrink-0 text-[11px]">
+                        open thread
+                      </span>
                     )}
                   </button>
                 ))
@@ -169,8 +171,8 @@ export function NewConversation({ inboxes = [] }: { inboxes?: ComposeInbox[] }) 
         ) : (
           <div className="p-3.5">
             <div className="mb-2.5 flex items-center gap-2">
-              <span className="text-[12px] text-muted-foreground">To</span>
-              <span className="flex items-center gap-1.5 rounded-md bg-secondary px-2 py-1 text-[12.5px] font-medium">
+              <span className="text-muted-foreground text-[12px]">To</span>
+              <span className="bg-secondary flex items-center gap-1.5 rounded-md px-2 py-1 text-[12.5px] font-medium">
                 {picked.name}
                 <button
                   onClick={() => setPicked(null)}
@@ -186,7 +188,7 @@ export function NewConversation({ inboxes = [] }: { inboxes?: ComposeInbox[] }) 
                 A single-number workspace never sees this row. */}
             {inboxes.length > 1 && (
               <div className="mb-2.5 flex flex-wrap items-center gap-1.5">
-                <span className="text-[12px] text-muted-foreground">From</span>
+                <span className="text-muted-foreground text-[12px]">From</span>
                 {inboxes.map((i) => (
                   <button
                     key={i.id}
@@ -199,7 +201,10 @@ export function NewConversation({ inboxes = [] }: { inboxes?: ComposeInbox[] }) 
                         : 'text-muted-foreground hover:border-border-strong hover:bg-accent',
                     )}
                   >
-                    <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: i.color }} />
+                    <span
+                      className="h-1.5 w-1.5 rounded-full"
+                      style={{ backgroundColor: i.color }}
+                    />
                     {i.name}
                   </button>
                 ))}
@@ -220,8 +225,8 @@ export function NewConversation({ inboxes = [] }: { inboxes?: ComposeInbox[] }) 
               className="resize-none text-[13.5px]"
             />
             <div className="mt-2.5 flex items-center justify-between">
-              <span className="flex items-center gap-1 text-[10.5px] text-muted-foreground">
-                <kbd className="rounded border bg-secondary px-1">
+              <span className="text-muted-foreground flex items-center gap-1 text-[10.5px]">
+                <kbd className="bg-secondary rounded border px-1">
                   <CornerDownLeft className="inline h-2.5 w-2.5" />
                 </kbd>
                 to send
@@ -243,7 +248,7 @@ export function NewConversationButton() {
     <button
       type="button"
       onClick={() => window.dispatchEvent(new Event('comms:new-conversation'))}
-      className="rounded-md p-1.5 text-muted-foreground transition-all duration-150 hover:bg-accent hover:text-foreground active:scale-95"
+      className="text-muted-foreground hover:bg-accent hover:text-foreground rounded-md p-1.5 transition-all duration-150 active:scale-95"
       title="New conversation (c)"
       aria-label="New conversation"
     >

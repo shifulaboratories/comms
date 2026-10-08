@@ -73,11 +73,9 @@ export function PersonCard(p: PersonCardProps) {
         {/* Their face is the way into their page. A group has no single
             person behind it, so there it stays a picture. */}
         <PersonLink contactId={p.isGroup ? null : p.contactId} label={p.name}>
-          <Avatar className="h-12 w-12 ring-1 ring-border">
+          <Avatar className="ring-border h-12 w-12 ring-1">
             {p.avatarUrl && <AvatarImage src={p.avatarUrl} alt={p.name} />}
-            <AvatarFallback className="type-item bg-secondary font-semibold text-muted-foreground">
-              {initials(p.name)}
-            </AvatarFallback>
+            <AvatarFallback className="type-item font-semibold">{initials(p.name)}</AvatarFallback>
           </Avatar>
         </PersonLink>
         <div className="min-w-0">
@@ -85,7 +83,7 @@ export function PersonCard(p: PersonCardProps) {
             <PersonLink
               contactId={p.isGroup ? null : p.contactId}
               label={p.name}
-              className="rounded transition-colors hover:text-brand"
+              className="hover:text-brand rounded transition-colors"
             >
               {p.name}
             </PersonLink>
@@ -111,20 +109,21 @@ export function PersonCard(p: PersonCardProps) {
       {!p.isGroup && p.addresses.length > 0 && (
         <div className="mt-3 space-y-0.5">
           {p.addresses.slice(0, 4).map((a) => (
-            <p key={a.value} className="type-body truncate text-muted-foreground">
+            <p key={a.value} className="type-body text-muted-foreground truncate">
               {formatAddress(a.raw ?? a.value) ?? a.value}
             </p>
           ))}
           {p.addresses.length > 4 && (
-            <p className="type-caption text-muted-foreground/70">
-              +{p.addresses.length - 4} more
-            </p>
+            <p className="type-caption text-muted-foreground/70">+{p.addresses.length - 4} more</p>
           )}
         </div>
       )}
 
       <dl className="mt-3.5 grid grid-cols-2 gap-x-3 gap-y-2">
-        <Stat label="Last heard from" value={p.lastInboundAt ? relativeTime(p.lastInboundAt) : '—'} />
+        <Stat
+          label="Last heard from"
+          value={p.lastInboundAt ? relativeTime(p.lastInboundAt) : '—'}
+        />
         <Stat
           label="You two have been talking"
           value={p.firstMessageAt ? `since ${relativeTime(p.firstMessageAt)}` : '—'}
@@ -134,15 +133,12 @@ export function PersonCard(p: PersonCardProps) {
           value={p.totalMessages ? p.totalMessages.toLocaleString() : '—'}
           icon={MessageSquare}
         />
-        <Stat
-          label="Lately"
-          value={perWeek > 0 ? `${perWeek}/week` : 'quiet'}
-        />
+        <Stat label="Lately" value={perWeek > 0 ? `${perWeek}/week` : 'quiet'} />
       </dl>
 
       {p.photos.length > 0 && (
         <div className="mt-4">
-          <p className="type-micro mb-1.5 flex items-center gap-1.5 text-muted-foreground/60">
+          <p className="type-micro text-muted-foreground/60 mb-1.5 flex items-center gap-1.5">
             <Images className="h-3 w-3" />
             Shared photos
             {p.photoCount > p.photos.length && (
@@ -163,7 +159,7 @@ export function PersonCard(p: PersonCardProps) {
                   src={`/api/attachments/${a.id}`}
                   alt={a.fileName ?? 'Shared photo'}
                   loading="lazy"
-                  className="h-full w-full object-cover transition-transform duration-300 ease-smooth group-hover:scale-105"
+                  className="ease-smooth h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
               </Link>
             ))}
@@ -185,9 +181,9 @@ function Stat({
 }) {
   return (
     <div className="min-w-0">
-      <dt className="type-caption truncate text-muted-foreground/70">{label}</dt>
+      <dt className="type-caption text-muted-foreground/70 truncate">{label}</dt>
       <dd className="type-item mt-px flex items-center gap-1 truncate">
-        {Icon && <Icon className="h-3 w-3 shrink-0 text-muted-foreground/60" />}
+        {Icon && <Icon className="text-muted-foreground/60 h-3 w-3 shrink-0" />}
         {value}
       </dd>
     </div>

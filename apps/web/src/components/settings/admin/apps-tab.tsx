@@ -68,14 +68,14 @@ function AppIcon({ name, domain }: { name: string; domain: string }) {
 
   if (failed) {
     return (
-      <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-secondary text-[13px] font-bold text-muted-foreground">
+      <div className="bg-secondary text-muted-foreground grid h-8 w-8 shrink-0 place-items-center rounded-lg text-[13px] font-bold">
         {name[0]}
       </div>
     );
   }
 
   return (
-    <div className="grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-lg border bg-surface">
+    <div className="bg-surface grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-lg border">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={`https://${domain}/favicon.ico`}
@@ -98,11 +98,11 @@ function AppCard({ app }: { app: AppEntry }) {
       <div className="min-w-0 flex-1">
         <p className="flex items-center gap-2 text-sm font-medium">
           {app.name}
-          <span className="rounded bg-secondary px-1.5 py-px text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+          <span className="bg-secondary type-micro text-muted-foreground rounded px-1.5 py-px">
             Coming soon
           </span>
         </p>
-        <p className="mt-0.5 text-[11.5px] leading-snug text-muted-foreground">{app.hint}</p>
+        <p className="text-muted-foreground mt-0.5 text-[11.5px] leading-snug">{app.hint}</p>
       </div>
     </div>
   );
@@ -123,7 +123,7 @@ export function AppsTab() {
           </CardContent>
         </Card>
       ))}
-      <p className="text-[11.5px] leading-relaxed text-muted-foreground">
+      <p className="text-muted-foreground text-[11.5px] leading-relaxed">
         These are the integrations being built, in the order shown. The platform layer underneath
         them — a sidebar-apps framework rendering your CRM&apos;s record inside the contact panel,
         plus outbound webhooks — is the same work, so each one gets cheaper than the last.

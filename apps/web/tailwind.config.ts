@@ -129,6 +129,15 @@ const config: Config = {
           from: { opacity: '0', transform: 'translateY(10px) scale(0.97)' },
           to: { opacity: '1', transform: 'translateY(0) scale(1)' },
         },
+        pixel: {
+          '0%, 100%': { opacity: '0.18' },
+          '12%': { opacity: '1' },
+          '40%': { opacity: '0.18' },
+        },
+        'text-shimmer': {
+          from: { backgroundPosition: '150% 0' },
+          to: { backgroundPosition: '-50% 0' },
+        },
         shimmer: {
           '100%': { transform: 'translateX(100%)' },
         },
@@ -150,6 +159,8 @@ const config: Config = {
         'slide-down': 'slide-down 0.35s cubic-bezier(0.32, 0.72, 0, 1)',
         'scale-in': 'scale-in 0.18s cubic-bezier(0.34, 1.56, 0.64, 1)',
         'bubble-in': 'bubble-in 0.32s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        pixel: 'pixel 1s linear infinite',
+        'text-shimmer': 'text-shimmer 2s linear infinite',
         shimmer: 'shimmer 1.8s infinite',
         'pulse-ring': 'pulse-ring 2s cubic-bezier(0.32, 0.72, 0, 1) infinite',
         'typing-dot': 'typing-dot 1.4s ease-in-out infinite',

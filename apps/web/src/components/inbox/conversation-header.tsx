@@ -96,9 +96,16 @@ export function ConversationHeader({
         toast.error(res.error);
         return;
       }
-      undoToast(next ? 'Pinned to the top of your inbox' : 'Unpinned', () =>
-        setPinned(conversationId, !next),
-      { onUndone: () => { setPinnedLocal(!next); router.refresh(); } });
+      undoToast(
+        next ? 'Pinned to the top of your inbox' : 'Unpinned',
+        () => setPinned(conversationId, !next),
+        {
+          onUndone: () => {
+            setPinnedLocal(!next);
+            router.refresh();
+          },
+        },
+      );
       router.refresh();
     });
   }
@@ -114,12 +121,16 @@ export function ConversationHeader({
         return;
       }
       if (next) {
-        undoToast('Muted — stays in place, stops notifying', () => setMuted(conversationId, false), {
-          onUndone: () => {
-            setMutedLocal(false);
-            router.refresh();
+        undoToast(
+          'Muted — stays in place, stops notifying',
+          () => setMuted(conversationId, false),
+          {
+            onUndone: () => {
+              setMutedLocal(false);
+              router.refresh();
+            },
           },
-        });
+        );
       } else {
         toast.success('Unmuted');
       }
@@ -185,26 +196,26 @@ export function ConversationHeader({
   }
 
   return (
-    <header className="flex h-[52px] shrink-0 items-center justify-between gap-2 border-b bg-surface/80 px-2.5 backdrop-blur-xl md:gap-4 md:px-4">
-      <div className="flex min-w-0 items-center gap-2 md:gap-2.5">
+    <header className="border-border-strong bg-background/80 flex h-[52px] shrink-0 items-center justify-between gap-2 border-b border-dashed px-2.5 backdrop-blur-xl md:gap-3 md:px-4">
+      <div className="flex min-w-[5rem] flex-1 items-center gap-2 md:gap-2.5">
         <Link
           href="/inbox"
-          className="-ml-0.5 rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground md:hidden"
+          className="text-muted-foreground hover:bg-accent hover:text-foreground -ml-0.5 rounded-lg p-1.5 transition-colors md:hidden"
           aria-label="Back to conversations"
         >
           <ChevronLeft className="h-5 w-5" />
         </Link>
         <h1 className="truncate text-[14px] font-semibold tracking-[-0.01em]">{name}</h1>
-        <span className="tabular hidden shrink-0 rounded-md bg-secondary px-1.5 py-px font-mono text-[11px] text-muted-foreground sm:inline">
+        <span className="tabular text-muted-foreground hidden shrink-0 rounded-md border px-1.5 py-px font-mono text-[10.5px] xl:inline">
           #{number}
         </span>
-        <span className="flex shrink-0 items-center gap-1.5 text-[11.5px] capitalize text-muted-foreground">
+        <span className="text-muted-foreground flex shrink-0 items-center gap-1.5 text-[11.5px] capitalize">
           <span className={cn('h-1.5 w-1.5 rounded-full', STATUS_DOT[status])} />
           {status}
         </span>
         {muted && (
           <span
-            className="flex shrink-0 items-center gap-1 text-[11.5px] text-muted-foreground"
+            className="text-muted-foreground flex shrink-0 items-center gap-1 text-[11.5px]"
             title="Muted — no unread badge, no notifications"
           >
             <BellOff className="h-3 w-3" />
@@ -213,7 +224,7 @@ export function ConversationHeader({
         )}
       </div>
 
-      <div className="flex shrink-0 items-center gap-1 md:gap-2">
+      <div className="flex shrink-0 items-center gap-1 md:gap-1.5">
         <div className="hidden sm:block">
           <PresenceBar conversationId={conversationId} />
         </div>
@@ -254,14 +265,14 @@ export function ConversationHeader({
             <DropdownMenuTrigger asChild>
               <Button size="sm" variant="ghost" className="gap-1.5">
                 <Clock className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Snooze</span>
-                <kbd className="ml-0.5 hidden rounded border bg-secondary px-1 text-[10px] text-muted-foreground md:inline">
+                <span className="hidden xl:inline">Snooze</span>
+                <kbd className="bg-secondary text-muted-foreground ml-0.5 hidden rounded border px-1 text-[10px] xl:inline">
                   s
                 </kbd>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52">
-              <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+              <DropdownMenuLabel className="text-muted-foreground text-xs font-normal">
                 Snooze until…
               </DropdownMenuLabel>
               {SNOOZE_PRESETS.map((p) => {
@@ -269,7 +280,7 @@ export function ConversationHeader({
                 return (
                   <DropdownMenuItem key={p.key} onClick={() => snooze(when, p.label)}>
                     <span className="flex-1">{p.label}</span>
-                    <span className="tabular text-[11px] text-muted-foreground">
+                    <span className="tabular text-muted-foreground text-[11px]">
                       {when.toLocaleDateString(undefined, { weekday: 'short' })}{' '}
                       {when.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}
                     </span>
@@ -278,7 +289,7 @@ export function ConversationHeader({
               })}
 
               <DropdownMenuSeparator />
-              <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+              <DropdownMenuLabel className="text-muted-foreground text-xs font-normal">
                 Remind me if no reply…
               </DropdownMenuLabel>
               {FOLLOW_UP_PRESETS.map((p) => (
@@ -288,16 +299,13 @@ export function ConversationHeader({
               ))}
 
               <DropdownMenuSeparator />
-              <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+              <DropdownMenuLabel className="text-muted-foreground text-xs font-normal">
                 Snooze until a specific time
               </DropdownMenuLabel>
               {/* onSelect is prevented so typing in here doesn't close the menu
                   on the first keystroke. */}
               <div onKeyDown={(e) => e.stopPropagation()}>
-                <CustomTimePicker
-                  onPick={(at) => snooze(at, describeTime(at))}
-                  autoFocus={false}
-                />
+                <CustomTimePicker onPick={(at) => snooze(at, describeTime(at))} autoFocus={false} />
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -312,7 +320,7 @@ export function ConversationHeader({
           <Button size="sm" onClick={() => applyStatus('closed')}>
             <Check className="h-3.5 w-3.5" />
             Close
-            <kbd className="ml-0.5 hidden rounded border border-primary-foreground/25 px-1 text-[10px] opacity-70 md:inline">
+            <kbd className="border-primary-foreground/25 ml-0.5 hidden rounded border px-1 text-[10px] opacity-70 xl:inline">
               e
             </kbd>
           </Button>
@@ -322,7 +330,7 @@ export function ConversationHeader({
         <button
           type="button"
           onClick={() => window.dispatchEvent(new Event('comms:toggle-details'))}
-          className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground lg:hidden"
+          className="text-muted-foreground hover:bg-accent hover:text-foreground rounded-lg p-1.5 transition-colors lg:hidden"
           aria-label="Ticket details"
         >
           <PanelRight className="h-[18px] w-[18px]" />

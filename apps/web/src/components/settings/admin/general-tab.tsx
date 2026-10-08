@@ -41,9 +41,9 @@ function AccessCell({ on, title }: { on: boolean; title: string }) {
   return (
     <span className="grid w-24 shrink-0 place-items-center" title={title}>
       {on ? (
-        <CheckCircle2 className="h-3.5 w-3.5 text-success" />
+        <CheckCircle2 className="text-success h-3.5 w-3.5" />
       ) : (
-        <span className="text-[12px] text-muted-foreground/40">—</span>
+        <span className="text-muted-foreground/40 text-[12px]">—</span>
       )}
     </span>
   );
@@ -61,7 +61,13 @@ export function GeneralTab({
   version: VersionInfo;
   administrators: AdminUserRow[];
   allUsers: AdminUserRow[];
-  recentUsers: { id: string; name: string | null; email: string; role: string; lastSeenAt: string | null }[];
+  recentUsers: {
+    id: string;
+    name: string | null;
+    email: string;
+    role: string;
+    lastSeenAt: string | null;
+  }[];
   currentUserId: string;
   canImpersonate: boolean;
   publicUrl: string;
@@ -96,13 +102,13 @@ export function GeneralTab({
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex flex-wrap items-center gap-3">
-            <span className="rounded-lg bg-secondary px-2.5 py-1 font-mono text-sm font-semibold">
+            <span className="bg-secondary rounded-lg px-2.5 py-1 font-mono text-sm font-semibold">
               v{version.current}
             </span>
             {version.latest ? (
               version.upToDate ? (
                 <Badge variant="secondary" className="gap-1">
-                  <CheckCircle2 className="h-3 w-3 text-success" />
+                  <CheckCircle2 className="text-success h-3 w-3" />
                   Up to date
                 </Badge>
               ) : (
@@ -110,13 +116,13 @@ export function GeneralTab({
                   href={version.latestUrl ?? '#'}
                   target="_blank"
                   rel="noreferrer"
-                  className="rounded-md bg-brand-muted px-2 py-0.5 text-[12px] font-medium text-brand hover:opacity-80"
+                  className="bg-brand-muted text-brand rounded-md px-2 py-0.5 text-[12px] font-medium hover:opacity-80"
                 >
                   {version.latest} available →
                 </a>
               )
             ) : (
-              <span className="text-[12.5px] text-muted-foreground">
+              <span className="text-muted-foreground text-[12.5px]">
                 {version.note ?? 'Latest release unknown.'}
               </span>
             )}
@@ -163,7 +169,7 @@ export function GeneralTab({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-          <div className="flex items-center gap-2 pb-1 text-[10.5px] font-semibold uppercase tracking-wide text-muted-foreground/70">
+          <div className="type-micro text-muted-foreground/70 flex items-center gap-2 pb-1">
             <span className="min-w-0 flex-1">Person</span>
             <span className="w-24 shrink-0 text-center">Super</span>
             <span className="w-24 shrink-0 text-center">Admin panel</span>
@@ -171,7 +177,7 @@ export function GeneralTab({
           </div>
 
           {administrators.length === 0 ? (
-            <p className="py-2 text-[12.5px] text-muted-foreground">
+            <p className="text-muted-foreground py-2 text-[12.5px]">
               Nobody has elevated access yet.
             </p>
           ) : (
@@ -179,19 +185,19 @@ export function GeneralTab({
               <div key={a.id} className="flex items-center gap-2">
                 <Avatar className="h-7 w-7 shrink-0">
                   {a.image && <AvatarImage src={a.image} alt="" />}
-                  <AvatarFallback className="bg-secondary text-[10px] font-semibold">
+                  <AvatarFallback className="text-[10px] font-semibold">
                     {initials(a.name ?? a.email)}
                   </AvatarFallback>
                 </Avatar>
                 <span className="min-w-0 flex-1">
                   <span className="flex items-center gap-1.5 truncate text-sm">
                     {a.name ?? a.email}
-                    {a.superAccess && <ShieldCheck className="h-3 w-3 shrink-0 text-brand" />}
+                    {a.superAccess && <ShieldCheck className="text-brand h-3 w-3 shrink-0" />}
                     {a.id === currentUserId && (
-                      <span className="text-[11px] text-muted-foreground">(you)</span>
+                      <span className="text-muted-foreground text-[11px]">(you)</span>
                     )}
                   </span>
-                  <span className="block truncate text-[11.5px] text-muted-foreground">
+                  <span className="text-muted-foreground block truncate text-[11.5px]">
                     {a.role}
                   </span>
                 </span>
@@ -202,7 +208,7 @@ export function GeneralTab({
             ))
           )}
 
-          <p className="border-t pt-2.5 text-[11px] leading-relaxed text-muted-foreground">
+          <p className="text-muted-foreground border-t pt-2.5 text-[11px] leading-relaxed">
             These columns come from each person&apos;s role — change them in{' '}
             <span className="font-medium">Settings → Roles</span>. A super account holds every
             permission, including ones added in later versions, and cannot be viewed as.
@@ -219,8 +225,8 @@ export function GeneralTab({
           {recentUsers.map((u) => (
             <div key={u.id} className="flex items-center gap-2.5 text-sm">
               <span className="min-w-0 flex-1 truncate">{u.name ?? u.email}</span>
-              <span className="shrink-0 text-[11.5px] text-muted-foreground">{u.role}</span>
-              <span className="w-24 shrink-0 text-right text-[11.5px] text-muted-foreground">
+              <span className="text-muted-foreground shrink-0 text-[11.5px]">{u.role}</span>
+              <span className="text-muted-foreground w-24 shrink-0 text-right text-[11.5px]">
                 {u.lastSeenAt ? relativeTime(u.lastSeenAt) : 'never'}
               </span>
             </div>
@@ -234,10 +240,10 @@ export function GeneralTab({
           <DialogHeader>
             <DialogTitle>View as a user</DialogTitle>
           </DialogHeader>
-          <p className="text-[12.5px] leading-relaxed text-muted-foreground">
+          <p className="text-muted-foreground text-[12.5px] leading-relaxed">
             You will see the app exactly as they do — their inbox, folders and permissions — in{' '}
-            <span className="font-medium text-foreground">read-only</span> mode. Nothing can be
-            sent or changed while viewing, and both the start and the end are recorded.
+            <span className="text-foreground font-medium">read-only</span> mode. Nothing can be sent
+            or changed while viewing, and both the start and the end are recorded.
           </p>
           <div className="max-h-64 space-y-1 overflow-y-auto">
             {viewableUsers.map((u) => (
@@ -246,11 +252,11 @@ export function GeneralTab({
                 type="button"
                 disabled={pending}
                 onClick={() => setViewTarget(u)}
-                className="flex w-full items-center gap-2.5 rounded-lg border px-2.5 py-2 text-left transition-colors hover:border-border-strong hover:bg-accent disabled:opacity-60"
+                className="hover:border-border-strong hover:bg-accent flex w-full items-center gap-2.5 rounded-lg border px-2.5 py-2 text-left transition-colors disabled:opacity-60"
               >
                 <Avatar className="h-7 w-7 shrink-0">
                   {u.image && <AvatarImage src={u.image} alt="" />}
-                  <AvatarFallback className="bg-secondary text-[10px] font-semibold">
+                  <AvatarFallback className="text-[10px] font-semibold">
                     {initials(u.name ?? u.email)}
                   </AvatarFallback>
                 </Avatar>
@@ -258,7 +264,7 @@ export function GeneralTab({
                   <span className="block truncate text-[12.5px] font-medium">
                     {u.name ?? u.email}
                   </span>
-                  <span className="block truncate text-[11px] text-muted-foreground">
+                  <span className="text-muted-foreground block truncate text-[11px]">
                     {u.email} · {u.role}
                   </span>
                 </span>
@@ -274,7 +280,7 @@ export function GeneralTab({
           <DialogHeader>
             <DialogTitle>View as {viewTarget?.name ?? viewTarget?.email}?</DialogTitle>
           </DialogHeader>
-          <p className="text-[12.5px] leading-relaxed text-muted-foreground">
+          <p className="text-muted-foreground text-[12.5px] leading-relaxed">
             A banner stays on screen until you stop. This is recorded in the audit log against your
             account.
           </p>
@@ -282,10 +288,7 @@ export function GeneralTab({
             <Button variant="ghost" onClick={() => setViewTarget(null)}>
               Cancel
             </Button>
-            <Button
-              loading={pending}
-              onClick={() => viewTarget && beginImpersonation(viewTarget)}
-            >
+            <Button loading={pending} onClick={() => viewTarget && beginImpersonation(viewTarget)}>
               <Eye className="mr-1 h-3.5 w-3.5" />
               Start viewing
             </Button>

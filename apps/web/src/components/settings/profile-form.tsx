@@ -44,9 +44,9 @@ export function ProfileForm({
       }}
     >
       <div className="flex items-center gap-4">
-        <Avatar className="h-14 w-14 ring-1 ring-border">
+        <Avatar className="ring-border h-14 w-14 ring-1">
           {image && <AvatarImage src={image} alt="" />}
-          <AvatarFallback className="bg-brand-muted text-sm font-semibold text-brand">
+          <AvatarFallback className="text-sm font-semibold">
             {initials(name || email)}
           </AvatarFallback>
         </Avatar>
@@ -60,7 +60,7 @@ export function ProfileForm({
             onChange={(e) => setImage(e.target.value)}
             placeholder="https://example.com/you.jpg"
           />
-          <p className="text-xs text-muted-foreground">Leave blank to use your initials instead.</p>
+          <p className="text-muted-foreground text-xs">Leave blank to use your initials instead.</p>
         </div>
       </div>
 
@@ -74,7 +74,7 @@ export function ProfileForm({
           placeholder="Your name"
           required
         />
-        <p className="text-xs text-muted-foreground">
+        <p className="text-muted-foreground text-xs">
           Teammates use this to @mention you in internal notes.
         </p>
       </div>

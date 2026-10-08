@@ -60,13 +60,13 @@ export function MacroPicker({
   if (filtered.length === 0) return null;
 
   return (
-    <div className="mb-1.5 overflow-hidden rounded-xl border bg-popover shadow-lg">
-      <div className="flex items-center gap-1.5 border-b px-3 py-1.5 text-[10.5px] font-medium uppercase tracking-[0.06em] text-muted-foreground">
+    <div className="bg-popover mb-1.5 overflow-hidden rounded-xl border shadow-lg">
+      <div className="type-micro text-muted-foreground flex items-center gap-1.5 border-b px-3 py-1.5">
         <Zap className="h-3 w-3" />
         Macros
         <span className="ml-auto flex items-center gap-1 normal-case tracking-normal">
-          <kbd className="rounded border bg-secondary px-1">↑↓</kbd>
-          <kbd className="rounded border bg-secondary px-1">
+          <kbd className="bg-secondary rounded border px-1">↑↓</kbd>
+          <kbd className="bg-secondary rounded border px-1">
             <CornerDownLeft className="inline h-2.5 w-2.5" />
           </kbd>
         </span>
@@ -91,17 +91,17 @@ export function MacroPicker({
             <span className="flex w-full items-center gap-1.5">
               <span className="text-[13px] font-medium">{m.name}</span>
               {m.shortcut && (
-                <span className="rounded bg-secondary px-1 font-mono text-[10px] text-muted-foreground">
+                <span className="bg-secondary text-muted-foreground rounded px-1 font-mono text-[10px]">
                   /{m.shortcut}
                 </span>
               )}
               {m.hasActions && (
-                <span className="ml-auto rounded bg-secondary px-1.5 text-[10px] text-muted-foreground">
+                <span className="bg-secondary text-muted-foreground ml-auto rounded px-1.5 text-[10px]">
                   + actions
                 </span>
               )}
             </span>
-            <span className="line-clamp-1 text-[11.5px] text-muted-foreground">{m.body}</span>
+            <span className="text-muted-foreground line-clamp-1 text-[11.5px]">{m.body}</span>
           </button>
         ))}
       </div>
@@ -139,5 +139,11 @@ export function useMacroPickerState(macros: MacroOption[], body: string) {
     [macros, open, query],
   );
   useEffect(() => setActiveIndex(0), [query]);
-  return { open: open && filtered.length > 0, query: query ?? '', filtered, activeIndex, setActiveIndex };
+  return {
+    open: open && filtered.length > 0,
+    query: query ?? '',
+    filtered,
+    activeIndex,
+    setActiveIndex,
+  };
 }

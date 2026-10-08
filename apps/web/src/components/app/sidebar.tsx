@@ -52,17 +52,17 @@ function NavRow({
       href={href}
       className={cn(
         'type-item group relative flex items-center gap-2.5 rounded-lg px-2.5 py-[7px] transition-colors duration-150',
-        active ? 'text-brand' : 'font-normal text-muted-foreground hover:text-foreground',
+        active ? 'text-foreground' : 'text-muted-foreground hover:text-foreground font-normal',
       )}
     >
       {active ? (
         <motion.span
           layoutId="nav-active"
-          className="absolute inset-0 -z-10 rounded-lg bg-brand-muted"
+          className="bg-accent shadow-xs ring-border-strong/40 absolute inset-0 -z-10 rounded-lg ring-1 ring-inset"
           transition={{ type: 'spring', stiffness: 500, damping: 38 }}
         />
       ) : (
-        <span className="absolute inset-0 -z-10 rounded-lg bg-transparent transition-colors duration-150 group-hover:bg-accent" />
+        <span className="group-hover:bg-accent/60 absolute inset-0 -z-10 rounded-lg bg-transparent transition-colors duration-150" />
       )}
 
       {Icon && <Icon className="h-[15px] w-[15px] shrink-0" />}
@@ -77,8 +77,8 @@ function NavRow({
       {count ? (
         <span
           className={cn(
-            'tabular type-caption shrink-0 tracking-tight transition-colors',
-            active ? 'text-brand' : 'text-muted-foreground/70',
+            'tabular shrink-0 font-mono text-[11px] tracking-tight transition-colors',
+            active ? 'text-foreground/80' : 'text-muted-foreground/70',
           )}
         >
           {count > 99 ? '99+' : count}
@@ -97,9 +97,7 @@ function SectionLabel({
 }) {
   return (
     <div className="flex items-center justify-between px-2.5 pb-1.5 pt-5 first:pt-1">
-      <span className="type-micro text-muted-foreground/60">
-        {children}
-      </span>
+      <span className="type-micro text-muted-foreground/70">{children}</span>
       {action}
     </div>
   );
@@ -137,7 +135,12 @@ export function Sidebar({
   const nav: NavItem[] = [
     { href: '/inbox', label: 'Inbox', icon: Inbox, count: counts.open },
     { href: '/inbox?assignee=me', label: 'Assigned to me', icon: Users, count: counts.mine },
-    { href: '/inbox?assignee=unassigned', label: 'Unassigned', icon: Hash, count: counts.unassigned },
+    {
+      href: '/inbox?assignee=unassigned',
+      label: 'Unassigned',
+      icon: Hash,
+      count: counts.unassigned,
+    },
     // Drafts is listed only when you have one — an empty folder that is always
     // there is chrome, one that appears is a reminder.
     ...(counts.drafts > 0
@@ -160,7 +163,7 @@ export function Sidebar({
       // No width transition on purpose: the stored width is only known after
       // mount, so an animated one would visibly slide the whole shell open on
       // every page load. Dragging wants instant anyway.
-      className="relative flex h-full w-[248px] shrink-0 flex-col border-r bg-surface-sunken md:w-[var(--sidebar-w)]"
+      className="border-border-strong bg-background relative flex h-full w-[248px] shrink-0 flex-col border-r border-dashed md:w-[var(--sidebar-w)]"
     >
       <SidebarResizer
         width={width}
@@ -176,7 +179,7 @@ export function Sidebar({
           <button
             type="button"
             onClick={() => window.dispatchEvent(new Event('comms:open-command'))}
-            className="rounded-md p-1.5 text-muted-foreground transition-all duration-150 hover:bg-accent hover:text-foreground active:scale-95"
+            className="text-muted-foreground hover:bg-accent hover:text-foreground rounded-md p-1.5 transition-all duration-150 active:scale-95"
             aria-label="Search (⌘K)"
             title="Search (⌘K)"
           >
@@ -197,11 +200,11 @@ export function Sidebar({
             : item.href.startsWith('/ask')
               ? pathname.startsWith('/ask')
               : isAll
-            ? onInbox &&
-              !activeInbox &&
-              !searchParams.get('assignee') &&
-              !searchParams.get('status')
-            : pathname === '/inbox' && searchParams.toString() === item.href.split('?')[1];
+                ? onInbox &&
+                  !activeInbox &&
+                  !searchParams.get('assignee') &&
+                  !searchParams.get('status')
+                : pathname === '/inbox' && searchParams.toString() === item.href.split('?')[1];
           return (
             <NavRow
               key={item.label}
@@ -221,7 +224,7 @@ export function Sidebar({
               onClick={() => window.dispatchEvent(new Event('comms:new-folder'))}
               title="New folder"
               aria-label="New folder"
-              className="rounded p-0.5 text-muted-foreground/70 transition-colors hover:text-foreground"
+              className="text-muted-foreground/70 hover:text-foreground rounded p-0.5 transition-colors"
             >
               <Plus className="h-3.5 w-3.5" />
             </button>
@@ -235,7 +238,7 @@ export function Sidebar({
           <Link
             href="/inbox"
             onClick={() => window.dispatchEvent(new Event('comms:new-folder'))}
-            className="type-item flex items-center gap-2.5 rounded-lg border border-dashed border-border-strong px-2.5 py-2 text-muted-foreground transition-colors hover:border-brand/40 hover:bg-brand-muted/50 hover:text-brand"
+            className="type-item border-border-strong text-muted-foreground hover:border-brand/40 hover:bg-brand-muted/50 hover:text-brand flex items-center gap-2.5 rounded-lg border border-dashed px-2.5 py-2 transition-colors"
           >
             <Plus className="h-[15px] w-[15px]" />
             New folder
@@ -258,7 +261,7 @@ export function Sidebar({
             <Link
               href="/settings/inboxes"
               title="Connect a number"
-              className="rounded p-0.5 text-muted-foreground/70 transition-colors hover:text-foreground"
+              className="text-muted-foreground/70 hover:text-foreground rounded p-0.5 transition-colors"
             >
               <Plus className="h-3.5 w-3.5" />
             </Link>
@@ -270,7 +273,7 @@ export function Sidebar({
         {inboxes.length === 0 ? (
           <Link
             href="/settings/inboxes"
-            className="flex items-center gap-2.5 rounded-lg border border-dashed border-border-strong px-2.5 py-2 type-item text-muted-foreground transition-colors hover:border-brand/40 hover:bg-brand-muted/50 hover:text-brand"
+            className="border-border-strong type-item text-muted-foreground hover:border-brand/40 hover:bg-brand-muted/50 hover:text-brand flex items-center gap-2.5 rounded-lg border border-dashed px-2.5 py-2 transition-colors"
           >
             <Plus className="h-[15px] w-[15px]" />
             Connect a number
@@ -282,7 +285,13 @@ export function Sidebar({
                 active — the Inbox row above already lights for the unified
                 view, and one `layoutId` pill cannot be in two places. */}
             {inboxes.length > 1 && (
-              <NavRow href="/inbox" active={false} icon={Layers} label="All numbers" count={counts.open} />
+              <NavRow
+                href="/inbox"
+                active={false}
+                icon={Layers}
+                label="All numbers"
+                count={counts.open}
+              />
             )}
             {inboxes.map((i) => (
               <NavRow
