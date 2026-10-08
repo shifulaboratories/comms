@@ -53,7 +53,7 @@ function Section({
 }) {
   return (
     <section className="border-t px-4 py-3.5 first:border-t-0">
-      <p className="mb-2.5 flex items-center gap-1.5 text-[10.5px] font-semibold uppercase tracking-[0.07em] text-muted-foreground/70">
+      <p className="text-muted-foreground/70 mb-2.5 flex items-center gap-1.5 text-[10.5px] font-semibold uppercase tracking-[0.07em]">
         {Icon && <Icon className="h-3 w-3" />}
         {label}
       </p>
@@ -83,7 +83,7 @@ function CollapsibleSection({
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className="type-micro flex w-full items-center gap-1.5 text-muted-foreground/70 transition-colors hover:text-foreground"
+        className="type-micro text-muted-foreground/70 hover:text-foreground flex w-full items-center gap-1.5 transition-colors"
       >
         <ChevronRight
           className={cn('h-3 w-3 transition-transform duration-150', open && 'rotate-90')}
@@ -98,7 +98,7 @@ function CollapsibleSection({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <span className="shrink-0 text-[12.5px] text-muted-foreground">{label}</span>
+      <span className="text-muted-foreground shrink-0 text-[12.5px]">{label}</span>
       <div className="w-[58%]">{children}</div>
     </div>
   );
@@ -211,14 +211,14 @@ export function TicketPanel({
         <PersonCard {...person} />
       ) : (
         <div className="flex flex-col items-center gap-2.5 px-4 py-5 text-center">
-          <Avatar className="h-14 w-14 ring-1 ring-border">
-            <AvatarFallback className="bg-brand-muted text-base font-semibold text-brand">
+          <Avatar className="ring-border h-14 w-14 ring-1">
+            <AvatarFallback className="bg-brand-muted text-brand text-base font-semibold">
               {initials(conversation.contactName)}
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0">
             <p className="type-title truncate">{conversation.contactName}</p>
-            <p className="type-body truncate text-muted-foreground">
+            <p className="type-body text-muted-foreground truncate">
               {conversation.contactIdentities[0] ?? 'No contact info'}
             </p>
           </div>
@@ -235,22 +235,22 @@ export function TicketPanel({
               const sub = m.name ? (formatAddress(m.rawAddress ?? m.address) ?? m.address) : null;
               const body = (
                 <>
-                  <Avatar className="h-7 w-7 ring-1 ring-border">
+                  <Avatar className="ring-border h-7 w-7 ring-1">
                     {m.avatarUrl && <AvatarImage src={m.avatarUrl} alt="" />}
-                    <AvatarFallback className="bg-secondary text-[10px] font-semibold text-muted-foreground">
+                    <AvatarFallback className="bg-secondary text-muted-foreground text-[10px] font-semibold">
                       {initials(display)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-[12.5px] font-medium">{display}</p>
                     {sub && (
-                      <p className="truncate font-mono text-[10.5px] text-muted-foreground">
+                      <p className="text-muted-foreground truncate font-mono text-[10.5px]">
                         {sub}
                       </p>
                     )}
                   </div>
                   {!m.name && (
-                    <span className="type-caption shrink-0 text-muted-foreground/60">unknown</span>
+                    <span className="type-caption text-muted-foreground/60 shrink-0">unknown</span>
                   )}
                 </>
               );
@@ -262,7 +262,7 @@ export function TicketPanel({
                 <Link
                   key={m.address}
                   href={`/people/${m.contactId}`}
-                  className="-mx-1.5 flex items-center gap-2.5 rounded-lg px-1.5 py-1 transition-colors hover:bg-accent"
+                  className="hover:bg-accent -mx-1.5 flex items-center gap-2.5 rounded-lg px-1.5 py-1 transition-colors"
                 >
                   {body}
                 </Link>
@@ -278,12 +278,12 @@ export function TicketPanel({
 
       {ai?.summary && (
         <Section label="AI summary" icon={Sparkles}>
-          <div className="rounded-lg border border-brand-border/50 bg-brand-muted/60 p-2.5">
+          <div className="border-brand-border/50 bg-brand-muted/60 rounded-lg border p-2.5">
             <p className="text-[12.5px] leading-relaxed">{ai.summary}</p>
             {(ai.topic || ai.sentiment) && (
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {ai.topic && (
-                  <span className="rounded-md bg-surface/70 px-1.5 py-px text-[11px] font-medium">
+                  <span className="bg-surface/70 rounded-md px-1.5 py-px text-[11px] font-medium">
                     {ai.topic}
                   </span>
                 )}
@@ -415,7 +415,7 @@ export function TicketPanel({
 
       <Section label="Tags">
         {allTags.length === 0 && !canManageTags ? (
-          <p className="text-[12px] text-muted-foreground">
+          <p className="text-muted-foreground text-[12px]">
             No tags yet — an admin can create them here or in Settings → Tags.
           </p>
         ) : (
@@ -429,10 +429,7 @@ export function TicketPanel({
                   onClick={() => {
                     const prev = tagIds;
                     optimistic(
-                      () =>
-                        setTagIds(
-                          active ? prev.filter((id) => id !== t.id) : [...prev, t.id],
-                        ),
+                      () => setTagIds(active ? prev.filter((id) => id !== t.id) : [...prev, t.id]),
                       () => setTagIds(prev),
                       () => toggleTag(conversation.id, t.id),
                     );
@@ -483,18 +480,18 @@ export function TicketPanel({
         <Section label="Service level">
           <div className="space-y-2">
             {sla!.slaBreachedAt ? (
-              <div className="flex items-center gap-2 rounded-lg border border-destructive/25 bg-destructive-muted px-2.5 py-2 text-[12px] font-medium text-destructive">
+              <div className="border-destructive/25 bg-destructive-muted text-destructive flex items-center gap-2 rounded-lg border px-2.5 py-2 text-[12px] font-medium">
                 <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
                 Response overdue
               </div>
             ) : sla!.nextResponseDueAt ? (
-              <div className="flex items-center gap-2 rounded-lg border bg-secondary/50 px-2.5 py-2 text-[12px] text-muted-foreground">
+              <div className="bg-secondary/50 text-muted-foreground flex items-center gap-2 rounded-lg border px-2.5 py-2 text-[12px]">
                 <Clock className="h-3.5 w-3.5 shrink-0" />
                 Due <span className="text-foreground">{relativeTime(sla!.nextResponseDueAt)}</span>
               </div>
             ) : null}
             {sla!.csatScore != null && (
-              <div className="flex items-center gap-1.5 px-0.5 text-[12px] text-muted-foreground">
+              <div className="text-muted-foreground flex items-center gap-1.5 px-0.5 text-[12px]">
                 <span>Rating</span>
                 <span className="ml-auto flex items-center gap-0.5">
                   {[1, 2, 3, 4, 5].map((n) => (
@@ -562,7 +559,7 @@ function TagCreator({
       <button
         type="button"
         onClick={() => setEditing(true)}
-        className="flex items-center gap-1 rounded-md border border-dashed border-border-strong px-2 py-0.5 text-[11.5px] font-medium text-muted-foreground transition-colors hover:border-brand/40 hover:text-brand"
+        className="border-border-strong text-muted-foreground hover:border-brand/40 hover:text-brand flex items-center gap-1 rounded-md border border-dashed px-2 py-0.5 text-[11.5px] font-medium transition-colors"
       >
         <Plus className="h-3 w-3" />
         New tag
@@ -583,7 +580,7 @@ function TagCreator({
         onBlur={submit}
         disabled={pending}
         placeholder="tag name"
-        className="w-24 rounded-md border bg-transparent px-2 py-0.5 text-[11.5px] outline-none focus:border-brand/50"
+        className="focus:border-brand/50 w-24 rounded-md border bg-transparent px-2 py-0.5 text-[11.5px] outline-none"
       />
     </span>
   );
@@ -640,7 +637,7 @@ function ChannelName({
         onBlur={submit}
         disabled={pending}
         maxLength={60}
-        className="w-full rounded-md border bg-transparent px-2 py-1 text-[12.5px] outline-none focus:border-brand/50"
+        className="focus:border-brand/50 w-full rounded-md border bg-transparent px-2 py-1 text-[12.5px] outline-none"
       />
     );
   }
@@ -654,7 +651,7 @@ function ChannelName({
           onClick={() => setEditing(true)}
           aria-label="Rename this number"
           title="Rename this number"
-          className="rounded p-1 text-muted-foreground/50 opacity-0 transition-all hover:text-foreground group-hover/chan:opacity-100"
+          className="text-muted-foreground/50 hover:text-foreground rounded p-1 opacity-0 transition-all group-hover/chan:opacity-100"
         >
           <Pencil className="h-3 w-3" />
         </button>
@@ -691,7 +688,7 @@ function ContactNotes({ contactId, initial }: { contactId: string; initial: stri
       rows={3}
       maxLength={4000}
       placeholder="Anything the next teammate should know about this person…"
-      className="w-full resize-none rounded-lg border bg-transparent px-2.5 py-2 text-[12.5px] leading-relaxed outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-brand/50"
+      className="placeholder:text-muted-foreground/60 focus:border-brand/50 w-full resize-none rounded-lg border bg-transparent px-2.5 py-2 text-[12.5px] leading-relaxed outline-none transition-colors"
     />
   );
 }
@@ -752,7 +749,7 @@ function ContactFields({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-3">
-        <span className="shrink-0 text-[12px] text-muted-foreground">Company</span>
+        <span className="text-muted-foreground shrink-0 text-[12px]">Company</span>
         <input
           value={company}
           onChange={(e) => setCompany(e.target.value)}
@@ -760,15 +757,13 @@ function ContactFields({
           onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
           maxLength={120}
           placeholder="—"
-          className="w-[58%] rounded-md border border-transparent bg-transparent px-1.5 py-0.5 text-right text-[12.5px] outline-none transition-colors hover:border-border focus:border-brand/50 focus:text-left"
+          className="hover:border-border focus:border-brand/50 w-[58%] rounded-md border border-transparent bg-transparent px-1.5 py-0.5 text-right text-[12.5px] outline-none transition-colors focus:text-left"
         />
       </div>
 
       {Object.entries(attributes).map(([key, value]) => (
         <div key={key} className="group/attr flex items-center justify-between gap-3">
-          <span className="min-w-0 shrink-0 truncate text-[12px] text-muted-foreground">
-            {key}
-          </span>
+          <span className="text-muted-foreground min-w-0 shrink-0 truncate text-[12px]">{key}</span>
           <span className="flex min-w-0 items-center gap-1">
             <span className="truncate text-[12.5px]">{value}</span>
             <button
@@ -776,7 +771,7 @@ function ContactFields({
               disabled={pending}
               onClick={() => removeField(key)}
               aria-label={`Remove ${key}`}
-              className="rounded p-0.5 text-muted-foreground/50 opacity-0 transition-all hover:text-destructive group-hover/attr:opacity-100"
+              className="text-muted-foreground/50 hover:text-destructive rounded p-0.5 opacity-0 transition-all group-hover/attr:opacity-100"
             >
               <X className="h-3 w-3" />
             </button>
@@ -792,7 +787,7 @@ function ContactFields({
             onChange={(e) => setNewKey(e.target.value)}
             placeholder="Field"
             maxLength={40}
-            className="w-2/5 rounded-md border bg-transparent px-2 py-1 text-[12px] outline-none focus:border-brand/50"
+            className="focus:border-brand/50 w-2/5 rounded-md border bg-transparent px-2 py-1 text-[12px] outline-none"
           />
           <input
             value={newValue}
@@ -800,14 +795,14 @@ function ContactFields({
             onKeyDown={(e) => e.key === 'Enter' && addField()}
             placeholder="Value"
             maxLength={500}
-            className="min-w-0 flex-1 rounded-md border bg-transparent px-2 py-1 text-[12px] outline-none focus:border-brand/50"
+            className="focus:border-brand/50 min-w-0 flex-1 rounded-md border bg-transparent px-2 py-1 text-[12px] outline-none"
           />
           <button
             type="button"
             onClick={addField}
             disabled={pending || !newKey.trim() || !newValue.trim()}
             aria-label="Save field"
-            className="rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
+            className="text-muted-foreground hover:text-foreground rounded-md p-1 transition-colors disabled:opacity-40"
           >
             <Check className="h-3.5 w-3.5" />
           </button>
@@ -816,7 +811,7 @@ function ContactFields({
         <button
           type="button"
           onClick={() => setAdding(true)}
-          className="flex items-center gap-1 text-[11.5px] font-medium text-muted-foreground transition-colors hover:text-brand"
+          className="text-muted-foreground hover:text-brand flex items-center gap-1 text-[11.5px] font-medium transition-colors"
         >
           <Plus className="h-3 w-3" />
           Add field

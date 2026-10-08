@@ -39,13 +39,7 @@ const STATUS_COPY: Record<
   },
 };
 
-export function HealthTab({
-  health,
-  version,
-}: {
-  health: SystemHealth;
-  version: VersionInfo;
-}) {
+export function HealthTab({ health, version }: { health: SystemHealth; version: VersionInfo }) {
   const router = useRouter();
   const status = STATUS_COPY[health.status];
 
@@ -67,12 +61,7 @@ export function HealthTab({
           <p className="text-[13.5px] font-semibold">{status.label}</p>
           <p className="text-[11.5px] opacity-80">{status.detail}</p>
         </div>
-        <Button
-          size="xs"
-          variant="ghost"
-          className="gap-1.5"
-          onClick={() => router.refresh()}
-        >
+        <Button size="xs" variant="ghost" className="gap-1.5" onClick={() => router.refresh()}>
           <RefreshCw className="h-3 w-3" />
           Refresh
         </Button>
@@ -86,18 +75,18 @@ export function HealthTab({
         <CardContent className="space-y-2.5">
           <div className="flex items-center gap-2.5 text-sm">
             <StatusDot ok={health.app.ok} />
-            <Globe className="h-3.5 w-3.5 text-muted-foreground" />
+            <Globe className="text-muted-foreground h-3.5 w-3.5" />
             <span className="flex-1">Web app</span>
-            <span className="text-[12px] text-muted-foreground">
+            <span className="text-muted-foreground text-[12px]">
               up {fmtUptime(health.app.uptimeSeconds)} · {health.app.memoryMb} MB ·{' '}
               {health.app.nodeVersion}
             </span>
           </div>
           <div className="flex items-center gap-2.5 text-sm">
             <StatusDot ok={health.db.ok} />
-            <Database className="h-3.5 w-3.5 text-muted-foreground" />
+            <Database className="text-muted-foreground h-3.5 w-3.5" />
             <span className="flex-1">Postgres</span>
-            <span className="text-[12px] text-muted-foreground">
+            <span className="text-muted-foreground text-[12px]">
               {health.db.ok
                 ? `${health.db.latencyMs}ms · ${fmtBytes(health.db.sizeBytes)}`
                 : (health.db.error ?? 'unreachable')}
@@ -105,9 +94,9 @@ export function HealthTab({
           </div>
           <div className="flex items-center gap-2.5 text-sm">
             <StatusDot ok={health.redis.ok} />
-            <Activity className="h-3.5 w-3.5 text-muted-foreground" />
+            <Activity className="text-muted-foreground h-3.5 w-3.5" />
             <span className="flex-1">Redis</span>
-            <span className="text-[12px] text-muted-foreground">
+            <span className="text-muted-foreground text-[12px]">
               {health.redis.ok
                 ? `${health.redis.latencyMs}ms`
                 : (health.redis.error ?? 'unreachable')}
@@ -115,9 +104,9 @@ export function HealthTab({
           </div>
           <div className="flex items-center gap-2.5 text-sm">
             <StatusDot ok={health.worker.ok} />
-            <Bot className="h-3.5 w-3.5 text-muted-foreground" />
+            <Bot className="text-muted-foreground h-3.5 w-3.5" />
             <span className="flex-1">Worker</span>
-            <span className="text-[12px] text-muted-foreground">
+            <span className="text-muted-foreground text-[12px]">
               {health.worker.ok
                 ? `alive · seen ${health.worker.lastSeenAt ? relativeTime(health.worker.lastSeenAt) : 'now'}`
                 : 'no heartbeat — is the worker service running?'}
@@ -173,7 +162,7 @@ export function HealthTab({
                     href={version.latestUrl ?? '#'}
                     target="_blank"
                     rel="noreferrer"
-                    className="font-medium text-brand hover:underline"
+                    className="text-brand font-medium hover:underline"
                   >
                     {version.latest} available
                   </a>
@@ -185,14 +174,10 @@ export function HealthTab({
           {/* Schema state: the quiet failure mode of a partial deploy. */}
           <div className="border-t pt-2.5">
             <div className="flex items-center gap-2.5 text-sm">
-              {health.schema.error ? (
-                <NeutralDot />
-              ) : (
-                <StatusDot ok={health.schema.upToDate} />
-              )}
-              <Layers className="h-3.5 w-3.5 text-muted-foreground" />
+              {health.schema.error ? <NeutralDot /> : <StatusDot ok={health.schema.upToDate} />}
+              <Layers className="text-muted-foreground h-3.5 w-3.5" />
               <span className="flex-1">Database schema</span>
-              <span className="text-[12px] text-muted-foreground">
+              <span className="text-muted-foreground text-[12px]">
                 {health.schema.error
                   ? 'could not read migration state'
                   : health.schema.upToDate
@@ -201,7 +186,7 @@ export function HealthTab({
               </span>
             </div>
             {!health.schema.upToDate && !health.schema.error && (
-              <p className="mt-1.5 rounded-lg border border-warning/40 bg-warning-muted px-2.5 py-1.5 text-[11.5px] leading-relaxed text-warning">
+              <p className="border-warning/40 bg-warning-muted text-warning mt-1.5 rounded-lg border px-2.5 py-1.5 text-[11.5px] leading-relaxed">
                 This build expects {health.schema.expected} migrations but the database has{' '}
                 {health.schema.applied}. Run <span className="font-mono">pnpm db:migrate</span> —
                 until then, features using the newest columns will error.
@@ -217,7 +202,7 @@ export function HealthTab({
           <CardTitle className="text-base">Queues</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-5 gap-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/70">
+          <div className="text-muted-foreground/70 grid grid-cols-5 gap-1 text-[11px] font-semibold uppercase tracking-wide">
             <span>Queue</span>
             <span className="text-right">Waiting</span>
             <span className="text-right">Active</span>
@@ -225,12 +210,12 @@ export function HealthTab({
             <span className="text-right">Failed</span>
           </div>
           {health.queues.map((q) => (
-            <div key={q.name} className="grid grid-cols-5 gap-1 py-1 text-sm tabular">
+            <div key={q.name} className="tabular grid grid-cols-5 gap-1 py-1 text-sm">
               <span className="font-mono text-[12.5px]">{q.name}</span>
               <span className="text-right">{q.waiting < 0 ? '—' : q.waiting}</span>
               <span className="text-right">{q.active < 0 ? '—' : q.active}</span>
               <span className="text-right">{q.delayed < 0 ? '—' : q.delayed}</span>
-              <span className={cn('text-right', q.failed > 0 && 'font-semibold text-destructive')}>
+              <span className={cn('text-right', q.failed > 0 && 'text-destructive font-semibold')}>
                 {q.failed < 0 ? '—' : q.failed}
               </span>
             </div>
@@ -245,13 +230,13 @@ export function HealthTab({
         </CardHeader>
         <CardContent className="space-y-2">
           {health.bridges.length === 0 ? (
-            <p className="text-[12.5px] text-muted-foreground">No numbers connected yet.</p>
+            <p className="text-muted-foreground text-[12.5px]">No numbers connected yet.</p>
           ) : (
             health.bridges.map((b) => (
               <div key={b.inboxName} className="flex items-center gap-2.5 text-sm">
                 <StatusDot ok={b.status === 'connected'} />
                 <span className="flex-1">{b.inboxName}</span>
-                <span className="text-[12px] capitalize text-muted-foreground">
+                <span className="text-muted-foreground text-[12px] capitalize">
                   {b.status}
                   {b.lastHeartbeatAt ? ` · ${relativeTime(b.lastHeartbeatAt)}` : ''}
                 </span>
@@ -273,13 +258,9 @@ export function HealthTab({
             { label: 'Voice transcription', ok: health.transcriptionConfigured },
           ].map((row) => (
             <div key={row.label} className="flex items-center gap-2.5 text-sm">
-              {row.ok ? (
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />
-              ) : (
-                <NeutralDot />
-              )}
+              {row.ok ? <CheckCircle2 className="text-success h-4 w-4 shrink-0" /> : <NeutralDot />}
               <span className="flex-1">{row.label}</span>
-              <span className="text-[12px] text-muted-foreground">
+              <span className="text-muted-foreground text-[12px]">
                 {row.ok ? 'configured' : 'not configured'}
               </span>
             </div>
@@ -290,7 +271,7 @@ export function HealthTab({
               "fine, you just don't use it" — so say the consequence out loud,
               with the number of pictures currently waiting on it. */}
           {!health.storageConfigured && (
-            <p className="rounded-lg border border-warning/40 bg-warning/10 px-2.5 py-2 text-[12px] leading-relaxed text-foreground/80">
+            <p className="border-warning/40 bg-warning/10 text-foreground/80 rounded-lg border px-2.5 py-2 text-[12px] leading-relaxed">
               <span className="font-medium">Photos won&rsquo;t appear anywhere</span> until this is
               configured — not in threads, not in the gallery.
               {health.attachmentsPending > 0 && (

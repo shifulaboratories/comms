@@ -170,9 +170,7 @@ function matchesViewFilters(
 
 /** True when a folder's filters are all ones the predicate above implements. */
 function isRenderableFolder(f: SectionFilters): boolean {
-  return !Object.entries(f).some(
-    ([k, v]) => !SECTION_KEYS.has(k) && v !== undefined && v !== null,
-  );
+  return !Object.entries(f).some(([k, v]) => !SECTION_KEYS.has(k) && v !== undefined && v !== null);
 }
 
 export function ConversationListPane({
@@ -216,9 +214,7 @@ export function ConversationListPane({
   // Pins are held locally so a click reorders the list on the same frame the
   // pointer goes down; the server action reconciles behind it. Re-seeded when
   // the server sends a new set, which is what makes another tab's pin show up.
-  const [pinnedIds, setPinnedIds] = useState<Set<string>>(
-    () => new Set(pinnedConversationIds),
-  );
+  const [pinnedIds, setPinnedIds] = useState<Set<string>>(() => new Set(pinnedConversationIds));
   useEffect(() => {
     setPinnedIds(new Set(pinnedConversationIds));
   }, [pinnedConversationIds.join(',')]);
@@ -282,22 +278,27 @@ export function ConversationListPane({
       const res = await bulkUpdateConversations(ids, patch);
       if (!res.ok) toast.error(res.error);
       else {
-        undoToast(`Updated ${ids.length} conversation${ids.length === 1 ? '' : 's'}`, async () => {
-          const byStatus = new Map<string, string[]>();
-          for (const [id, status] of prevStatuses) {
-            // Bulk updates can't produce 'snoozed'; a formerly-snoozed row
-            // reopens instead, which is also what unsnoozing would do.
-            const restorable = status === 'open' || status === 'pending' || status === 'closed' ? status : 'open';
-            byStatus.set(restorable, [...(byStatus.get(restorable) ?? []), id]);
-          }
-          for (const [status, group] of byStatus) {
-            const r = await bulkUpdateConversations(group, {
-              status: status as 'open' | 'pending' | 'closed',
-            });
-            if (!r.ok) return r;
-          }
-          return { ok: true as const };
-        }, { onUndone: () => router.refresh() });
+        undoToast(
+          `Updated ${ids.length} conversation${ids.length === 1 ? '' : 's'}`,
+          async () => {
+            const byStatus = new Map<string, string[]>();
+            for (const [id, status] of prevStatuses) {
+              // Bulk updates can't produce 'snoozed'; a formerly-snoozed row
+              // reopens instead, which is also what unsnoozing would do.
+              const restorable =
+                status === 'open' || status === 'pending' || status === 'closed' ? status : 'open';
+              byStatus.set(restorable, [...(byStatus.get(restorable) ?? []), id]);
+            }
+            for (const [status, group] of byStatus) {
+              const r = await bulkUpdateConversations(group, {
+                status: status as 'open' | 'pending' | 'closed',
+              });
+              if (!r.ok) return r;
+            }
+            return { ok: true as const };
+          },
+          { onUndone: () => router.refresh() },
+        );
         setSelected(new Set());
         router.refresh();
       }
@@ -389,21 +390,18 @@ export function ConversationListPane({
       return true;
     });
 
-    const time = (c: (typeof rows)[number]) =>
-      new Date(c.lastMessageAt ?? c.createdAt).getTime();
+    const time = (c: (typeof rows)[number]) => new Date(c.lastMessageAt ?? c.createdAt).getTime();
     // In the snoozed folder the question is "what comes back next", so wake
     // order beats recency — same as every mail client's snoozed list.
     if (statusFilter === 'snoozed') {
       rows.sort(
-        (a, b) =>
-          new Date(a.snoozedUntil ?? 0).getTime() - new Date(b.snoozedUntil ?? 0).getTime(),
+        (a, b) => new Date(a.snoozedUntil ?? 0).getTime() - new Date(b.snoozedUntil ?? 0).getTime(),
       );
     } else if (sort === 'oldest') rows.sort((a, b) => time(a) - time(b));
     else if (sort === 'priority')
       rows.sort(
         (a, b) =>
-          (PRIORITY_RANK[a.priority] ?? 9) - (PRIORITY_RANK[b.priority] ?? 9) ||
-          time(b) - time(a),
+          (PRIORITY_RANK[a.priority] ?? 9) - (PRIORITY_RANK[b.priority] ?? 9) || time(b) - time(a),
       );
     else rows.sort((a, b) => time(b) - time(a));
 
@@ -531,9 +529,11 @@ export function ConversationListPane({
         toast.error(res.error);
         return;
       }
-      undoToast(`Dissolved “${name}” — it won't be recreated`, () =>
-        restoreBundle(res.name, res.conversationIds),
-      { onUndone: () => router.refresh() });
+      undoToast(
+        `Dissolved “${name}” — it won't be recreated`,
+        () => restoreBundle(res.name, res.conversationIds),
+        { onUndone: () => router.refresh() },
+      );
       router.refresh();
     });
   }
@@ -541,9 +541,7 @@ export function ConversationListPane({
   /** Toggle a tag in the URL filter — used by the clickable tag chips. */
   function toggleTagFilter(tagId: string) {
     const current = (searchParams.get('tags') ?? '').split(',').filter(Boolean);
-    const next = current.includes(tagId)
-      ? current.filter((t) => t !== tagId)
-      : [...current, tagId];
+    const next = current.includes(tagId) ? current.filter((t) => t !== tagId) : [...current, tagId];
     const params = new URLSearchParams(searchParams.toString());
     if (next.length) params.set('tags', next.join(','));
     else params.delete('tags');
@@ -630,13 +628,13 @@ export function ConversationListPane({
     // once a conversation is open; md+ shows both panes side by side.
     <div
       className={cn(
-        'w-full shrink-0 flex-col border-r bg-surface md:flex md:w-[380px]',
+        'bg-surface w-full shrink-0 flex-col border-r md:flex md:w-[380px]',
         activeId ? 'hidden' : 'flex',
       )}
     >
       <div className="pane-x space-y-2.5 pb-3 pt-3">
         <div className="group relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-[15px] w-[15px] -translate-y-1/2 text-muted-foreground/70 transition-colors group-focus-within:text-brand" />
+          <Search className="text-muted-foreground/70 group-focus-within:text-brand pointer-events-none absolute left-3 top-1/2 h-[15px] w-[15px] -translate-y-1/2 transition-colors" />
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -650,7 +648,7 @@ export function ConversationListPane({
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
                 onClick={() => setQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded p-0.5 text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground absolute right-2.5 top-1/2 -translate-y-1/2 rounded p-0.5"
                 aria-label="Clear search"
               >
                 <X className="h-3.5 w-3.5" />
@@ -661,62 +659,62 @@ export function ConversationListPane({
 
         {/* Sliding segmented control — quick presets over the filter bar. */}
         <div className="flex items-center gap-1">
-        <div className="flex flex-1 items-center gap-0.5 rounded-xl bg-secondary/60 p-[3px]">
-          {tabs.map((t) => {
-            const isActive =
-              (t.key === 'active' && !assignee && statusFilter === 'active') ||
-              (t.key === 'mine' && assignee === 'me') ||
-              (t.key === 'drafts' && statusFilter === 'drafts') ||
-              (t.key === 'snoozed' && statusFilter === 'snoozed') ||
-              (t.key === 'closed' && statusFilter === 'closed');
-            return (
-              <Link
-                key={t.key}
-                href={t.href}
-                className={cn(
-                  'type-caption relative flex-1 rounded-lg px-2 py-1.5 text-center font-medium transition-colors duration-150',
-                  isActive ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
-                )}
-              >
-                {isActive && (
-                  <motion.span
-                    layoutId="list-tab"
-                    className="absolute inset-0 rounded-lg bg-surface shadow-xs"
-                    transition={{ type: 'spring', stiffness: 500, damping: 38 }}
-                  />
-                )}
-                <span className="relative">{t.label}</span>
-              </Link>
-            );
-          })}
-        </div>
+          <div className="bg-secondary/60 flex flex-1 items-center gap-0.5 rounded-xl p-[3px]">
+            {tabs.map((t) => {
+              const isActive =
+                (t.key === 'active' && !assignee && statusFilter === 'active') ||
+                (t.key === 'mine' && assignee === 'me') ||
+                (t.key === 'drafts' && statusFilter === 'drafts') ||
+                (t.key === 'snoozed' && statusFilter === 'snoozed') ||
+                (t.key === 'closed' && statusFilter === 'closed');
+              return (
+                <Link
+                  key={t.key}
+                  href={t.href}
+                  className={cn(
+                    'type-caption relative flex-1 rounded-lg px-2 py-1.5 text-center font-medium transition-colors duration-150',
+                    isActive ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
+                  )}
+                >
+                  {isActive && (
+                    <motion.span
+                      layoutId="list-tab"
+                      className="bg-surface shadow-xs absolute inset-0 rounded-lg"
+                      transition={{ type: 'spring', stiffness: 500, damping: 38 }}
+                    />
+                  )}
+                  <span className="relative">{t.label}</span>
+                </Link>
+              );
+            })}
+          </div>
 
-        {/* Focus & Reply: work this exact queue one screen at a time. */}
-        <Link
-          href={`/focus?queue=${assignee === 'me' ? 'mine' : statusFilter === 'drafts' ? 'drafts' : 'inbox'}`}
-          title="Focus & Reply — work the stack one conversation at a time"
-          aria-label="Focus and reply"
-          className="rounded-lg p-1.5 text-muted-foreground transition-all duration-150 hover:bg-accent hover:text-foreground active:scale-95"
-        >
-          <Crosshair className="h-[15px] w-[15px]" />
-        </Link>
-        {canGroup && (
-          <button
-            type="button"
-            onClick={toggleGrouping}
-            title={grouping ? 'Show as a flat list' : 'Group similar conversations'}
-            aria-label="Toggle bundle grouping"
-            aria-pressed={grouping}
-            className={cn(
-              'rounded-lg p-1.5 transition-all duration-150 hover:bg-accent active:scale-95',
-              grouping && bundleGroups.length > 0
-                ? 'text-brand'
-                : 'text-muted-foreground hover:text-foreground',
-            )}
+          {/* Focus & Reply: work this exact queue one screen at a time. */}
+          <Link
+            href={`/focus?queue=${assignee === 'me' ? 'mine' : statusFilter === 'drafts' ? 'drafts' : 'inbox'}`}
+            title="Focus & Reply — work the stack one conversation at a time"
+            aria-label="Focus and reply"
+            className="text-muted-foreground hover:bg-accent hover:text-foreground rounded-lg p-1.5 transition-all duration-150 active:scale-95"
           >
-            <Boxes className="h-[15px] w-[15px]" />
-          </button>
-        )}
+            <Crosshair className="h-[15px] w-[15px]" />
+          </Link>
+          {canGroup && (
+            <button
+              type="button"
+              onClick={toggleGrouping}
+              title={grouping ? 'Show as a flat list' : 'Group similar conversations'}
+              aria-label="Toggle bundle grouping"
+              aria-pressed={grouping}
+              className={cn(
+                'hover:bg-accent rounded-lg p-1.5 transition-all duration-150 active:scale-95',
+                grouping && bundleGroups.length > 0
+                  ? 'text-brand'
+                  : 'text-muted-foreground hover:text-foreground',
+              )}
+            >
+              <Boxes className="h-[15px] w-[15px]" />
+            </button>
+          )}
         </div>
       </div>
 
@@ -729,12 +727,12 @@ export function ConversationListPane({
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 400, damping: 34 }}
-            className="overflow-hidden border-y bg-brand-muted/60"
+            className="bg-brand-muted/60 overflow-hidden border-y"
           >
             <div className="flex items-center gap-2 px-3 py-2 text-xs">
-              <span className="font-medium text-brand">{selected.size} selected</span>
+              <span className="text-brand font-medium">{selected.size} selected</span>
               <div className="ml-auto flex items-center gap-0.5">
-                {bulkPending && <Loader2 className="h-3.5 w-3.5 animate-spin text-brand" />}
+                {bulkPending && <Loader2 className="text-brand h-3.5 w-3.5 animate-spin" />}
                 <Button
                   size="xs"
                   variant="ghost"
@@ -762,13 +760,13 @@ export function ConversationListPane({
 
       <div className="pane-x min-h-0 flex-1 overflow-y-auto pb-2">
         {inboxZero ? (
-          <div className="flex animate-slide-up flex-col items-center justify-center gap-3.5 px-6 py-20 text-center">
-            <div className="grid h-14 w-14 place-items-center rounded-2xl bg-primary text-primary-foreground">
+          <div className="animate-slide-up flex flex-col items-center justify-center gap-3.5 px-6 py-20 text-center">
+            <div className="bg-primary text-primary-foreground grid h-14 w-14 place-items-center rounded-2xl">
               <Check className="h-6 w-6" strokeWidth={2.5} />
             </div>
             <div>
               <p className="type-title">Inbox Zero</p>
-              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+              <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
                 Every conversation handled. Nicely done — new messages will appear here the moment
                 they arrive.
               </p>
@@ -776,7 +774,7 @@ export function ConversationListPane({
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
-            <div className="grid h-11 w-11 place-items-center rounded-xl bg-secondary text-muted-foreground">
+            <div className="bg-secondary text-muted-foreground grid h-11 w-11 place-items-center rounded-xl">
               <InboxIcon className="h-5 w-5" />
             </div>
             <div>
@@ -794,7 +792,7 @@ export function ConversationListPane({
                         ? 'No unsent drafts'
                         : 'Nothing here yet'}
               </p>
-              <p className="mt-0.5 text-xs text-muted-foreground">
+              <p className="text-muted-foreground mt-0.5 text-xs">
                 {query
                   ? 'Try a different search term.'
                   : statusFilter === 'snoozed'
@@ -828,15 +826,15 @@ export function ConversationListPane({
                     >
                       <ChevronDown
                         className={cn(
-                          'h-3 w-3 shrink-0 text-muted-foreground/60 transition-transform duration-150',
+                          'text-muted-foreground/60 h-3 w-3 shrink-0 transition-transform duration-150',
                           collapsedBundles.has(sec.folder.id) && '-rotate-90',
                         )}
                       />
-                      <FolderIcon className="h-3 w-3 shrink-0 text-muted-foreground/70" />
-                      <span className="type-micro truncate text-muted-foreground">
+                      <FolderIcon className="text-muted-foreground/70 h-3 w-3 shrink-0" />
+                      <span className="type-micro text-muted-foreground truncate">
                         {sec.folder.name}
                       </span>
-                      <span className="tabular type-caption shrink-0 text-muted-foreground/60">
+                      <span className="tabular type-caption text-muted-foreground/60 shrink-0">
                         {sec.rows.length}
                       </span>
                     </button>
@@ -859,15 +857,15 @@ export function ConversationListPane({
                     >
                       <ChevronDown
                         className={cn(
-                          'h-3 w-3 shrink-0 text-muted-foreground/60 transition-transform duration-150',
+                          'text-muted-foreground/60 h-3 w-3 shrink-0 transition-transform duration-150',
                           collapsedBundles.has(sec.bundle.id) && '-rotate-90',
                         )}
                       />
-                      <Boxes className="h-3 w-3 shrink-0 text-brand" />
-                      <span className="type-micro truncate text-muted-foreground">
+                      <Boxes className="text-brand h-3 w-3 shrink-0" />
+                      <span className="type-micro text-muted-foreground truncate">
                         {sec.bundle.name}
                       </span>
-                      <span className="tabular type-caption shrink-0 text-muted-foreground/60">
+                      <span className="tabular type-caption text-muted-foreground/60 shrink-0">
                         {sec.rows.length}
                       </span>
                     </button>
@@ -876,275 +874,288 @@ export function ConversationListPane({
                       onClick={() => dissolve(sec.bundle!.id, sec.bundle!.name)}
                       title="Dissolve this bundle"
                       aria-label={`Dissolve bundle ${sec.bundle.name}`}
-                      className="rounded p-0.5 text-muted-foreground/50 opacity-0 transition-all hover:text-foreground group-hover/bundle:opacity-100"
+                      className="text-muted-foreground/50 hover:text-foreground rounded p-0.5 opacity-0 transition-all group-hover/bundle:opacity-100"
                     >
                       <X className="h-3 w-3" />
                     </button>
                   </div>
                 )}
                 {sec.key === 'rest' && (
-                  <p className="type-micro px-2 pb-0.5 pt-3 text-muted-foreground/60">Other</p>
+                  <p className="type-micro text-muted-foreground/60 px-2 pb-0.5 pt-3">Other</p>
                 )}
                 {!collapsedBundles.has(sec.bundle?.id ?? sec.folder?.id ?? '') &&
                   sec.rows.map((c) => {
-              const active = c.id === activeId;
-              const isSelected = selected.has(c.id);
-              const nameInput = {
-                contactName: c.contact?.displayName,
-                contactAddress: c.contact?.identities?.[0]?.value,
-                // The GUID carries the number even when no contact was linked.
-                chatGuid: c.providerChatGuid,
-                title: c.title,
-                isGroup: c.isGroup,
-              };
-              const name = conversationName(nameInput);
-              const unread = c.unreadCount > 0;
-              const nudgeMeta = (c.metadata as { nudge?: { dismissedAt?: string } } | null)?.nudge;
-              const hasNudge = Boolean(nudgeMeta && !nudgeMeta.dismissedAt);
-              const muted = Boolean(c.mutedAt);
-              const isPinned = pinnedIds.has(c.id);
-              // Only for threads the classifier called a code — running the
-              // extractor over every preview would find false positives in
-              // order numbers and addresses.
-              const otpCode = c.kind === 'otp' ? extractOtpCode(c.lastMessagePreview) : null;
-              const hasMeta =
-                unread ||
-                hasNudge ||
-                c.readNoReply ||
-                Boolean(c.slaBreachedAt) ||
-                Boolean(c.nextResponseDueAt && c.status !== 'closed') ||
-                (c.status !== 'open' && c.status !== 'closed') ||
-                (showChannels && Boolean(c.inbox)) ||
-                (c.tags?.length ?? 0) > 0;
+                    const active = c.id === activeId;
+                    const isSelected = selected.has(c.id);
+                    const nameInput = {
+                      contactName: c.contact?.displayName,
+                      contactAddress: c.contact?.identities?.[0]?.value,
+                      // The GUID carries the number even when no contact was linked.
+                      chatGuid: c.providerChatGuid,
+                      title: c.title,
+                      isGroup: c.isGroup,
+                    };
+                    const name = conversationName(nameInput);
+                    const unread = c.unreadCount > 0;
+                    const nudgeMeta = (c.metadata as { nudge?: { dismissedAt?: string } } | null)
+                      ?.nudge;
+                    const hasNudge = Boolean(nudgeMeta && !nudgeMeta.dismissedAt);
+                    const muted = Boolean(c.mutedAt);
+                    const isPinned = pinnedIds.has(c.id);
+                    // Only for threads the classifier called a code — running the
+                    // extractor over every preview would find false positives in
+                    // order numbers and addresses.
+                    const otpCode = c.kind === 'otp' ? extractOtpCode(c.lastMessagePreview) : null;
+                    const hasMeta =
+                      unread ||
+                      hasNudge ||
+                      c.readNoReply ||
+                      Boolean(c.slaBreachedAt) ||
+                      Boolean(c.nextResponseDueAt && c.status !== 'closed') ||
+                      (c.status !== 'open' && c.status !== 'closed') ||
+                      (showChannels && Boolean(c.inbox)) ||
+                      (c.tags?.length ?? 0) > 0;
 
-              return (
-                <Link
-                  key={c.id}
-                  href={`/inbox/${c.id}`}
-                  className={cn(
-                    'group relative flex gap-3 rounded-xl px-3 py-3 transition-colors duration-150',
-                    active ? 'bg-brand-muted' : isSelected ? 'bg-accent' : 'hover:bg-accent/60',
-                  )}
-                >
-                  {/* Priority spine — urgent and high only. A marker that
-                      appears on every row marks nothing. */}
-                  {(c.priority === 'urgent' || c.priority === 'high') && (
-                    <span
-                      className={cn(
-                        'absolute inset-y-3 left-0 w-[3px] rounded-full',
-                        PRIORITY_SPINE[c.priority],
-                      )}
-                    />
-                  )}
-
-                  <div className="relative h-10 w-10 shrink-0">
-                    <Avatar
-                      className={cn(
-                        'h-10 w-10 ring-1 ring-border transition-opacity duration-150',
-                        // Only fade the face away once selecting is actually
-                        // happening. Blanking every avatar on casual hover made
-                        // scanning the list flicker.
-                        selecting && 'group-hover:opacity-0',
-                        isSelected && 'opacity-0',
-                      )}
-                    >
-                      {c.contact?.avatarUrl && <AvatarImage src={c.contact.avatarUrl} alt={name} />}
-                      <AvatarFallback className="type-caption bg-secondary font-semibold text-muted-foreground">
-                        {initials(nameForInitials(nameInput))}
-                      </AvatarFallback>
-                    </Avatar>
-
-                    {/* Checkbox occupies the avatar's slot on hover — no layout shift. */}
-                    <button
-                      onClick={(e) => toggleSelect(c.id, e)}
-                      className={cn(
-                        'absolute inset-0 grid place-items-center rounded-full border transition-all duration-150',
-                        isSelected
-                          ? 'border-brand bg-brand text-brand-foreground opacity-100'
-                          : cn(
-                              'border-border-strong bg-surface text-transparent opacity-0 hover:border-brand hover:text-muted-foreground',
-                              // Reachable on hover of the avatar itself, and
-                              // shown across the list once selection begins.
-                              selecting ? 'group-hover:opacity-100' : 'hover:opacity-100',
-                            ),
-                      )}
-                      aria-label={isSelected ? 'Deselect' : 'Select'}
-                    >
-                      <Check className="h-4 w-4" />
-                    </button>
-                  </div>
-
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-baseline justify-between gap-2.5">
-                      <p
+                    return (
+                      <Link
+                        key={c.id}
+                        href={`/inbox/${c.id}`}
                         className={cn(
-                          'type-title truncate',
-                          !unread && 'font-medium text-foreground/90',
+                          'group relative flex gap-3 rounded-xl px-3 py-3 transition-colors duration-150',
+                          active
+                            ? 'bg-brand-muted'
+                            : isSelected
+                              ? 'bg-accent'
+                              : 'hover:bg-accent/60',
                         )}
                       >
-                        {name}
-                      </p>
-                      <span className="tabular type-caption flex shrink-0 items-center gap-1 text-muted-foreground/80">
-                        {muted && (
-                          <BellOff
-                            className="h-3 w-3 text-muted-foreground/60"
-                            aria-label="Muted"
+                        {/* Priority spine — urgent and high only. A marker that
+                      appears on every row marks nothing. */}
+                        {(c.priority === 'urgent' || c.priority === 'high') && (
+                          <span
+                            className={cn(
+                              'absolute inset-y-3 left-0 w-[3px] rounded-full',
+                              PRIORITY_SPINE[c.priority],
+                            )}
                           />
                         )}
-                        {/* Visible once pinned, otherwise only on hover: an
+
+                        <div className="relative h-10 w-10 shrink-0">
+                          <Avatar
+                            className={cn(
+                              'ring-border h-10 w-10 ring-1 transition-opacity duration-150',
+                              // Only fade the face away once selecting is actually
+                              // happening. Blanking every avatar on casual hover made
+                              // scanning the list flicker.
+                              selecting && 'group-hover:opacity-0',
+                              isSelected && 'opacity-0',
+                            )}
+                          >
+                            {c.contact?.avatarUrl && (
+                              <AvatarImage src={c.contact.avatarUrl} alt={name} />
+                            )}
+                            <AvatarFallback className="type-caption bg-secondary text-muted-foreground font-semibold">
+                              {initials(nameForInitials(nameInput))}
+                            </AvatarFallback>
+                          </Avatar>
+
+                          {/* Checkbox occupies the avatar's slot on hover — no layout shift. */}
+                          <button
+                            onClick={(e) => toggleSelect(c.id, e)}
+                            className={cn(
+                              'absolute inset-0 grid place-items-center rounded-full border transition-all duration-150',
+                              isSelected
+                                ? 'border-brand bg-brand text-brand-foreground opacity-100'
+                                : cn(
+                                    'border-border-strong bg-surface hover:border-brand hover:text-muted-foreground text-transparent opacity-0',
+                                    // Reachable on hover of the avatar itself, and
+                                    // shown across the list once selection begins.
+                                    selecting ? 'group-hover:opacity-100' : 'hover:opacity-100',
+                                  ),
+                            )}
+                            aria-label={isSelected ? 'Deselect' : 'Select'}
+                          >
+                            <Check className="h-4 w-4" />
+                          </button>
+                        </div>
+
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-baseline justify-between gap-2.5">
+                            <p
+                              className={cn(
+                                'type-title truncate',
+                                !unread && 'text-foreground/90 font-medium',
+                              )}
+                            >
+                              {name}
+                            </p>
+                            <span className="tabular type-caption text-muted-foreground/80 flex shrink-0 items-center gap-1">
+                              {muted && (
+                                <BellOff
+                                  className="text-muted-foreground/60 h-3 w-3"
+                                  aria-label="Muted"
+                                />
+                              )}
+                              {/* Visible once pinned, otherwise only on hover: an
                             affordance on every row at all times is noise, but
                             a pin you can't see isn't a pin. */}
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            pin(c.id, name);
-                          }}
-                          title={isPinned ? 'Unpin' : 'Pin to top'}
-                          aria-label={isPinned ? `Unpin ${name}` : `Pin ${name} to top`}
-                          aria-pressed={isPinned}
-                          className={cn(
-                            'rounded p-0.5 transition-all duration-150 hover:text-foreground',
-                            isPinned
-                              ? 'text-brand'
-                              : 'text-muted-foreground/50 opacity-0 group-hover:opacity-100 focus-visible:opacity-100',
-                          )}
-                        >
-                          <Pin className={cn('h-3 w-3', isPinned && 'fill-current')} />
-                        </button>
-                        {listTime(c.lastMessageAt)}
-                      </span>
-                    </div>
+                              <button
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  pin(c.id, name);
+                                }}
+                                title={isPinned ? 'Unpin' : 'Pin to top'}
+                                aria-label={isPinned ? `Unpin ${name}` : `Pin ${name} to top`}
+                                aria-pressed={isPinned}
+                                className={cn(
+                                  'hover:text-foreground rounded p-0.5 transition-all duration-150',
+                                  isPinned
+                                    ? 'text-brand'
+                                    : 'text-muted-foreground/50 opacity-0 focus-visible:opacity-100 group-hover:opacity-100',
+                                )}
+                              >
+                                <Pin className={cn('h-3 w-3', isPinned && 'fill-current')} />
+                              </button>
+                              {listTime(c.lastMessageAt)}
+                            </span>
+                          </div>
 
-                    {/* Two lines, not one. A single truncated line tells you
+                          {/* Two lines, not one. A single truncated line tells you
                         almost nothing about a text message, and the second line
                         is what lets you triage without opening the thread. */}
-                    {/* An unsent draft outranks everything — it is the thing
+                          {/* An unsent draft outranks everything — it is the thing
                         you have to deal with. Then the code chip: a
                         verification code is read once and never replied to,
                         so copying it here means never opening the thread. */}
-                    {draftIds.has(c.id) ? (
-                      <p className="type-body mt-1 flex items-center gap-1.5 text-muted-foreground">
-                        <Pencil className="h-3 w-3 shrink-0 text-warning" />
-                        <span className="truncate italic">Draft</span>
-                      </p>
-                    ) : otpCode ? (
-                      <div className="mt-1 flex items-center gap-1.5">
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            void navigator.clipboard
-                              .writeText(otpCode)
-                              .then(() => toast.success(`Copied ${otpCode}`))
-                              .catch(() => toast.error('Could not copy'));
-                          }}
-                          title="Copy code"
-                          className="tabular flex items-center gap-1.5 rounded-md border border-brand/40 bg-brand-muted px-1.5 py-0.5 font-mono text-[12px] font-semibold text-brand transition-colors hover:bg-brand-muted/70"
-                        >
-                          <KeyRound className="h-3 w-3" />
-                          {otpCode}
-                          <Copy className="h-2.5 w-2.5 opacity-60" />
-                        </button>
-                      </div>
-                    ) : (
-                      <p
-                        className={cn(
-                          'type-body mt-1 line-clamp-2',
-                          unread ? 'text-foreground/75' : 'text-muted-foreground',
-                        )}
-                      >
-                        {c.lastMessagePreview || 'No messages yet'}
-                      </p>
-                    )}
+                          {draftIds.has(c.id) ? (
+                            <p className="type-body text-muted-foreground mt-1 flex items-center gap-1.5">
+                              <Pencil className="text-warning h-3 w-3 shrink-0" />
+                              <span className="truncate italic">Draft</span>
+                            </p>
+                          ) : otpCode ? (
+                            <div className="mt-1 flex items-center gap-1.5">
+                              <button
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  void navigator.clipboard
+                                    .writeText(otpCode)
+                                    .then(() => toast.success(`Copied ${otpCode}`))
+                                    .catch(() => toast.error('Could not copy'));
+                                }}
+                                title="Copy code"
+                                className="tabular border-brand/40 bg-brand-muted text-brand hover:bg-brand-muted/70 flex items-center gap-1.5 rounded-md border px-1.5 py-0.5 font-mono text-[12px] font-semibold transition-colors"
+                              >
+                                <KeyRound className="h-3 w-3" />
+                                {otpCode}
+                                <Copy className="h-2.5 w-2.5 opacity-60" />
+                              </button>
+                            </div>
+                          ) : (
+                            <p
+                              className={cn(
+                                'type-body mt-1 line-clamp-2',
+                                unread ? 'text-foreground/75' : 'text-muted-foreground',
+                              )}
+                            >
+                              {c.lastMessagePreview || 'No messages yet'}
+                            </p>
+                          )}
 
-                    {hasMeta && (
-                      <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                        {unread && (
-                          <Badge variant="brand" size="sm" className="tabular">
-                            {c.unreadCount}
-                          </Badge>
-                        )}
-                        {/* Apple tells us they opened it. Saying so is the
+                          {hasMeta && (
+                            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                              {unread && (
+                                <Badge variant="brand" size="sm" className="tabular">
+                                  {c.unreadCount}
+                                </Badge>
+                              )}
+                              {/* Apple tells us they opened it. Saying so is the
                             whole reason this data is worth having. */}
-                        {c.readNoReply && !unread && (
-                          <Badge variant="outline" size="sm" className="gap-1">
-                            <Eye className="h-3 w-3" />
-                            Seen
-                          </Badge>
-                        )}
-                        {/* A promise you made and haven't kept outranks most
+                              {c.readNoReply && !unread && (
+                                <Badge variant="outline" size="sm" className="gap-1">
+                                  <Eye className="h-3 w-3" />
+                                  Seen
+                                </Badge>
+                              )}
+                              {/* A promise you made and haven't kept outranks most
                             other row facts — it's the one only you can fix. */}
-                        {hasNudge && (
-                          <Badge variant="soft-warning" size="sm" className="gap-1">
-                            <AlarmClockCheck className="h-3 w-3" />
-                            Nudge
-                          </Badge>
-                        )}
-                        {c.slaBreachedAt ? (
-                          <Badge variant="soft-danger" size="sm">
-                            Overdue
-                          </Badge>
-                        ) : c.nextResponseDueAt && c.status !== 'closed' ? (
-                          <Badge variant="soft-warning" size="sm">
-                            due {relativeTime(c.nextResponseDueAt)}
-                          </Badge>
-                        ) : null}
-                        {/* In the snoozed folder the useful fact is when it
+                              {hasNudge && (
+                                <Badge variant="soft-warning" size="sm" className="gap-1">
+                                  <AlarmClockCheck className="h-3 w-3" />
+                                  Nudge
+                                </Badge>
+                              )}
+                              {c.slaBreachedAt ? (
+                                <Badge variant="soft-danger" size="sm">
+                                  Overdue
+                                </Badge>
+                              ) : c.nextResponseDueAt && c.status !== 'closed' ? (
+                                <Badge variant="soft-warning" size="sm">
+                                  due {relativeTime(c.nextResponseDueAt)}
+                                </Badge>
+                              ) : null}
+                              {/* In the snoozed folder the useful fact is when it
                             comes back, not that it is snoozed — you can see
                             that from the folder you are standing in. */}
-                        {c.status === 'snoozed' && c.snoozedUntil ? (
-                          <Badge variant="outline" size="sm">
-                            wakes {relativeTime(c.snoozedUntil)}
-                          </Badge>
-                        ) : (
-                          c.status !== 'open' &&
-                          c.status !== 'closed' && (
-                            <Badge variant="outline" size="sm" className="capitalize">
-                              {c.status}
-                            </Badge>
-                          )
-                        )}
-                        {showChannels && c.inbox && (
-                          <span
-                            className="type-caption inline-flex items-center gap-1 rounded-md px-1.5 py-px font-medium"
-                            style={{ backgroundColor: `${c.inbox.color}18`, color: c.inbox.color }}
-                            title={`Number: ${c.inbox.name}`}
-                          >
-                            <span
-                              className="h-1.5 w-1.5 rounded-full"
-                              style={{ backgroundColor: c.inbox.color }}
-                            />
-                            {c.inbox.name}
-                          </span>
-                        )}
-                        {c.tags?.slice(0, 2).map((t) => (
-                          // Clicking a tag filters the list by it — the whole
-                          // point of tagging, and previously a dead end.
-                          <button
-                            key={t.tag.id}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              toggleTagFilter(t.tag.id);
-                            }}
-                            title={`Filter by ${t.tag.name}`}
-                            className="type-caption inline-flex items-center rounded-md px-1.5 py-px font-medium transition-opacity hover:opacity-75"
-                            style={{ backgroundColor: `${t.tag.color}18`, color: t.tag.color }}
-                          >
-                            {t.tag.name}
-                          </button>
-                        ))}
-                        {(c.tags?.length ?? 0) > 2 && (
-                          <span className="type-caption text-muted-foreground/70">
-                            +{c.tags!.length - 2}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </Link>
-              );
+                              {c.status === 'snoozed' && c.snoozedUntil ? (
+                                <Badge variant="outline" size="sm">
+                                  wakes {relativeTime(c.snoozedUntil)}
+                                </Badge>
+                              ) : (
+                                c.status !== 'open' &&
+                                c.status !== 'closed' && (
+                                  <Badge variant="outline" size="sm" className="capitalize">
+                                    {c.status}
+                                  </Badge>
+                                )
+                              )}
+                              {showChannels && c.inbox && (
+                                <span
+                                  className="type-caption inline-flex items-center gap-1 rounded-md px-1.5 py-px font-medium"
+                                  style={{
+                                    backgroundColor: `${c.inbox.color}18`,
+                                    color: c.inbox.color,
+                                  }}
+                                  title={`Number: ${c.inbox.name}`}
+                                >
+                                  <span
+                                    className="h-1.5 w-1.5 rounded-full"
+                                    style={{ backgroundColor: c.inbox.color }}
+                                  />
+                                  {c.inbox.name}
+                                </span>
+                              )}
+                              {c.tags?.slice(0, 2).map((t) => (
+                                // Clicking a tag filters the list by it — the whole
+                                // point of tagging, and previously a dead end.
+                                <button
+                                  key={t.tag.id}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    toggleTagFilter(t.tag.id);
+                                  }}
+                                  title={`Filter by ${t.tag.name}`}
+                                  className="type-caption inline-flex items-center rounded-md px-1.5 py-px font-medium transition-opacity hover:opacity-75"
+                                  style={{
+                                    backgroundColor: `${t.tag.color}18`,
+                                    color: t.tag.color,
+                                  }}
+                                >
+                                  {t.tag.name}
+                                </button>
+                              ))}
+                              {(c.tags?.length ?? 0) > 2 && (
+                                <span className="type-caption text-muted-foreground/70">
+                                  +{c.tags!.length - 2}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </Link>
+                    );
                   })}
               </div>
             ))}

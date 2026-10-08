@@ -20,7 +20,13 @@ import { cn } from '@/lib/utils';
  * actually be around to honor — and land in the composer as plain text,
  * because the person on the other end has a Messages app, not a booking page.
  */
-export function OfferTimes({ hours, onInsert }: { hours: BusinessHours; onInsert: (text: string) => void }) {
+export function OfferTimes({
+  hours,
+  onInsert,
+}: {
+  hours: BusinessHours;
+  onInsert: (text: string) => void;
+}) {
   const [open, setOpen] = useState(false);
   const [duration, setDuration] = useState(30);
   const [picked, setPicked] = useState<AvailabilitySlot[]>([]);
@@ -72,7 +78,7 @@ export function OfferTimes({ hours, onInsert }: { hours: BusinessHours; onInsert
       <PopoverContent align="end" className="w-72 p-0">
         <div className="flex items-center justify-between border-b px-3 py-2">
           <p className="text-[12px] font-medium">Offer times</p>
-          <div className="flex items-center gap-0.5 rounded-lg bg-secondary/70 p-0.5">
+          <div className="bg-secondary/70 flex items-center gap-0.5 rounded-lg p-0.5">
             {[15, 30, 60].map((d) => (
               <button
                 key={d}
@@ -96,13 +102,13 @@ export function OfferTimes({ hours, onInsert }: { hours: BusinessHours; onInsert
 
         <div className="max-h-64 overflow-y-auto p-2">
           {byDay.length === 0 ? (
-            <p className="px-2 py-6 text-center text-[12px] text-muted-foreground">
+            <p className="text-muted-foreground px-2 py-6 text-center text-[12px]">
               No open slots inside your business hours. Adjust them in Settings → Workspace.
             </p>
           ) : (
             byDay.map(([day, daySlots]) => (
               <div key={day} className="mb-2">
-                <p className="px-1.5 pb-1 text-[10.5px] font-semibold uppercase tracking-wide text-muted-foreground/70">
+                <p className="text-muted-foreground/70 px-1.5 pb-1 text-[10.5px] font-semibold uppercase tracking-wide">
                   {daySlots[0]!.start.toLocaleDateString(undefined, {
                     weekday: 'long',
                     month: 'short',
@@ -118,13 +124,16 @@ export function OfferTimes({ hours, onInsert }: { hours: BusinessHours; onInsert
                         type="button"
                         onClick={() => toggle(s)}
                         className={cn(
-                          'rounded-md border px-2 py-1 text-[11.5px] font-medium tabular transition-all duration-150 active:scale-95',
+                          'tabular rounded-md border px-2 py-1 text-[11.5px] font-medium transition-all duration-150 active:scale-95',
                           active
                             ? 'border-brand bg-brand-muted text-brand'
                             : 'text-muted-foreground hover:border-border-strong hover:bg-accent',
                         )}
                       >
-                        {s.start.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}
+                        {s.start.toLocaleTimeString(undefined, {
+                          hour: 'numeric',
+                          minute: '2-digit',
+                        })}
                       </button>
                     );
                   })}
@@ -135,7 +144,7 @@ export function OfferTimes({ hours, onInsert }: { hours: BusinessHours; onInsert
         </div>
 
         <div className="flex items-center justify-between border-t px-3 py-2">
-          <span className="text-[10.5px] text-muted-foreground">
+          <span className="text-muted-foreground text-[10.5px]">
             {picked.length === 0
               ? 'Pick one or more slots'
               : picked.length === 1

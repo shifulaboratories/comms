@@ -319,7 +319,10 @@ export function Composer({
       if (shared) {
         if (!me?.id) return;
         // The composer only ever unshares its own draft.
-        const res = await unshareDraft(conversationId, me.id).catch(() => ({ ok: false as const, error: 'Failed' }));
+        const res = await unshareDraft(conversationId, me.id).catch(() => ({
+          ok: false as const,
+          error: 'Failed',
+        }));
         if (res.ok) {
           setShared(false);
           toast.success('Draft is private again');
@@ -433,7 +436,7 @@ export function Composer({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 4 }}
             role="status"
-            className="type-caption mb-1.5 flex items-center gap-2 rounded-lg border border-warning/30 bg-warning-muted px-2.5 py-1.5 text-warning"
+            className="type-caption border-warning/30 bg-warning-muted text-warning mb-1.5 flex items-center gap-2 rounded-lg border px-2.5 py-1.5"
           >
             <Users className="h-3.5 w-3.5 shrink-0" />
             <span className="flex-1">
@@ -457,10 +460,10 @@ export function Composer({
           reads as a single object rather than three stacked strips. */}
       <div
         className={cn(
-          'rounded-xl border bg-surface shadow-sm transition-all duration-200 ease-smooth',
-          focused && !isNote && 'border-brand/50 ring-[3px] ring-brand/12',
+          'bg-surface ease-smooth rounded-xl border shadow-sm transition-all duration-200',
+          focused && !isNote && 'border-brand/50 ring-brand/12 ring-[3px]',
           isNote && 'border-warning/45 bg-warning-muted/40',
-          focused && isNote && 'ring-[3px] ring-warning/15',
+          focused && isNote && 'ring-warning/15 ring-[3px]',
         )}
       >
         {/* Reply-to banner: shows what this message threads onto. */}
@@ -473,15 +476,15 @@ export function Composer({
               transition={{ type: 'spring', stiffness: 420, damping: 34 }}
               className="overflow-hidden"
             >
-              <div className="mx-2 mt-2 flex items-start gap-2 rounded-lg border-l-2 border-primary bg-secondary/60 px-2.5 py-1.5">
-                <CornerUpLeft className="mt-px h-3 w-3 shrink-0 text-muted-foreground" />
-                <span className="line-clamp-1 flex-1 text-[11.5px] text-muted-foreground">
+              <div className="border-primary bg-secondary/60 mx-2 mt-2 flex items-start gap-2 rounded-lg border-l-2 px-2.5 py-1.5">
+                <CornerUpLeft className="text-muted-foreground mt-px h-3 w-3 shrink-0" />
+                <span className="text-muted-foreground line-clamp-1 flex-1 text-[11.5px]">
                   {replyTo.body || 'Attachment'}
                 </span>
                 <button
                   type="button"
                   onClick={onCancelReply}
-                  className="shrink-0 rounded p-0.5 text-muted-foreground transition-colors hover:text-foreground"
+                  className="text-muted-foreground hover:text-foreground shrink-0 rounded p-0.5 transition-colors"
                   aria-label="Cancel reply"
                 >
                   <X className="h-3 w-3" />
@@ -493,7 +496,7 @@ export function Composer({
 
         <div className="flex items-center justify-between gap-2 px-2 pt-2">
           {/* Segmented reply/note switch — clearer than a bare toggle. */}
-          <div className="flex items-center gap-0.5 rounded-lg bg-secondary/70 p-0.5">
+          <div className="bg-secondary/70 flex items-center gap-0.5 rounded-lg p-0.5">
             <button
               type="button"
               onClick={() => setIsNote(false)}
@@ -505,7 +508,7 @@ export function Composer({
               {!isNote && (
                 <motion.span
                   layoutId="composer-mode"
-                  className="absolute inset-0 rounded-[0.4rem] bg-surface shadow-xs"
+                  className="bg-surface shadow-xs absolute inset-0 rounded-[0.4rem]"
                   transition={{ type: 'spring', stiffness: 500, damping: 38 }}
                 />
               )}
@@ -522,7 +525,7 @@ export function Composer({
               {isNote && (
                 <motion.span
                   layoutId="composer-mode"
-                  className="absolute inset-0 rounded-[0.4rem] bg-surface shadow-xs"
+                  className="bg-surface shadow-xs absolute inset-0 rounded-[0.4rem]"
                   transition={{ type: 'spring', stiffness: 500, damping: 38 }}
                 />
               )}
@@ -542,7 +545,9 @@ export function Composer({
                 onClick={toggleShare}
                 disabled={sharePending}
                 className={cn('gap-1.5', shared && 'text-brand')}
-                title={shared ? 'Shared with the team — click to unshare' : 'Share draft for review'}
+                title={
+                  shared ? 'Shared with the team — click to unshare' : 'Share draft for review'
+                }
               >
                 <Share2 className="h-3.5 w-3.5" />
                 {shared ? 'Shared' : 'Share'}
@@ -569,8 +574,8 @@ export function Composer({
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent align="end" className="w-80 p-1">
-                  <p className="px-2.5 py-1.5 text-[10.5px] text-muted-foreground">
-                    Tip: type <kbd className="rounded border bg-secondary px-1">/</kbd> in the
+                  <p className="text-muted-foreground px-2.5 py-1.5 text-[10.5px]">
+                    Tip: type <kbd className="bg-secondary rounded border px-1">/</kbd> in the
                     composer to search macros without leaving the keyboard.
                   </p>
                   <div className="max-h-72 overflow-y-auto">
@@ -578,22 +583,22 @@ export function Composer({
                       <button
                         key={m.id}
                         onClick={() => pickMacro(m)}
-                        className="flex w-full flex-col items-start gap-0.5 rounded-md px-2.5 py-2 text-left transition-colors hover:bg-accent"
+                        className="hover:bg-accent flex w-full flex-col items-start gap-0.5 rounded-md px-2.5 py-2 text-left transition-colors"
                       >
                         <span className="flex w-full items-center gap-1.5">
                           <span className="text-[13px] font-medium">{m.name}</span>
                           {m.shortcut && (
-                            <span className="rounded bg-secondary px-1 font-mono text-[10px] text-muted-foreground">
+                            <span className="bg-secondary text-muted-foreground rounded px-1 font-mono text-[10px]">
                               /{m.shortcut}
                             </span>
                           )}
                           {m.hasActions && (
-                            <span className="ml-auto rounded bg-secondary px-1.5 text-[10px] text-muted-foreground">
+                            <span className="bg-secondary text-muted-foreground ml-auto rounded px-1.5 text-[10px]">
                               + actions
                             </span>
                           )}
                         </span>
-                        <span className="line-clamp-2 text-[11.5px] leading-snug text-muted-foreground">
+                        <span className="text-muted-foreground line-clamp-2 text-[11.5px] leading-snug">
                           {m.body}
                         </span>
                       </button>
@@ -621,24 +626,24 @@ export function Composer({
                 <span className="text-muted-foreground/50">{completion}</span>
               </div>
             )}
-          <Textarea
-            ref={ref}
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            onKeyDown={onKeyDown}
-            onScroll={syncGhostScroll}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
-            placeholder={
-              isNote
-                ? 'Write an internal note — the customer never sees this…'
-                : aiDraft
-                  ? 'Type a message…  ⇥ to accept the suggested reply'
-                  : 'Type a message…  /  for macros'
-            }
-            className="relative max-h-[180px] min-h-[38px] w-full resize-none border-0 bg-transparent px-1.5 py-1.5 text-[13.5px] shadow-none focus-visible:ring-0 md:text-[13.5px]"
-            rows={1}
-          />
+            <Textarea
+              ref={ref}
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              onKeyDown={onKeyDown}
+              onScroll={syncGhostScroll}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              placeholder={
+                isNote
+                  ? 'Write an internal note — the customer never sees this…'
+                  : aiDraft
+                    ? 'Type a message…  ⇥ to accept the suggested reply'
+                    : 'Type a message…  /  for macros'
+              }
+              className="relative max-h-[180px] min-h-[38px] w-full resize-none border-0 bg-transparent px-1.5 py-1.5 text-[13.5px] shadow-none focus-visible:ring-0 md:text-[13.5px]"
+              rows={1}
+            />
           </div>
           <AnimatePresence mode="popLayout">
             {canSend || pending ? (
@@ -663,7 +668,7 @@ export function Composer({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56">
-                      <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                      <DropdownMenuLabel className="text-muted-foreground text-xs font-normal">
                         Send later…
                       </DropdownMenuLabel>
                       {SEND_LATER_PRESETS.map((p) => {
@@ -671,7 +676,7 @@ export function Composer({
                         return (
                           <DropdownMenuItem key={p.key} onClick={() => submit(when)}>
                             <span className="flex-1">{p.label}</span>
-                            <span className="tabular text-[11px] text-muted-foreground">
+                            <span className="tabular text-muted-foreground text-[11px]">
                               {when.toLocaleDateString(undefined, { weekday: 'short' })}{' '}
                               {when.toLocaleTimeString(undefined, {
                                 hour: 'numeric',
@@ -682,7 +687,7 @@ export function Composer({
                         );
                       })}
                       <DropdownMenuSeparator />
-                      <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                      <DropdownMenuLabel className="text-muted-foreground text-xs font-normal">
                         Or a specific time
                       </DropdownMenuLabel>
                       <div onKeyDown={(e) => e.stopPropagation()}>
@@ -707,10 +712,13 @@ export function Composer({
       </div>
 
       {/* The hint has to follow the setting, or it teaches the wrong key. */}
-      <p className="hidden items-center gap-1 px-1.5 pt-1.5 text-[10.5px] text-muted-foreground md:flex">
+      <p className="text-muted-foreground hidden items-center gap-1 px-1.5 pt-1.5 text-[10.5px] md:flex">
         {viaInbox && (
           <>
-            <span className="flex items-center gap-1" title={`Replies go out from ${viaInbox.name}`}>
+            <span
+              className="flex items-center gap-1"
+              title={`Replies go out from ${viaInbox.name}`}
+            >
               <span
                 className="h-1.5 w-1.5 rounded-full"
                 style={{ backgroundColor: viaInbox.color }}
@@ -734,29 +742,29 @@ export function Composer({
         )}
         {completion && (
           <>
-            <kbd className="rounded border bg-secondary px-1 font-sans text-[10px]">⇥</kbd>
+            <kbd className="bg-secondary rounded border px-1 font-sans text-[10px]">⇥</kbd>
             to complete
             <span className="opacity-40">·</span>
           </>
         )}
         {enterSends ? (
           <>
-            <kbd className="rounded border bg-secondary px-1 font-sans text-[10px]">
+            <kbd className="bg-secondary rounded border px-1 font-sans text-[10px]">
               <CornerDownLeft className="inline h-2.5 w-2.5" />
             </kbd>
             to send
             <span className="opacity-40">·</span>
-            <kbd className="rounded border bg-secondary px-1 font-sans text-[10px]">Shift</kbd>+
-            <kbd className="rounded border bg-secondary px-1 font-sans text-[10px]">↵</kbd>
+            <kbd className="bg-secondary rounded border px-1 font-sans text-[10px]">Shift</kbd>+
+            <kbd className="bg-secondary rounded border px-1 font-sans text-[10px]">↵</kbd>
             for a new line
           </>
         ) : (
           <>
-            <kbd className="rounded border bg-secondary px-1 font-sans text-[10px]">⌘</kbd>+
-            <kbd className="rounded border bg-secondary px-1 font-sans text-[10px]">↵</kbd>
+            <kbd className="bg-secondary rounded border px-1 font-sans text-[10px]">⌘</kbd>+
+            <kbd className="bg-secondary rounded border px-1 font-sans text-[10px]">↵</kbd>
             to send
             <span className="opacity-40">·</span>
-            <kbd className="rounded border bg-secondary px-1 font-sans text-[10px]">
+            <kbd className="bg-secondary rounded border px-1 font-sans text-[10px]">
               <CornerDownLeft className="inline h-2.5 w-2.5" />
             </kbd>
             for a new line

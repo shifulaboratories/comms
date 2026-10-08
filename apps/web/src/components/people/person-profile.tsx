@@ -183,7 +183,7 @@ export function PersonProfile({ data }: { data: PersonProfileData }) {
     <div className="mx-auto w-full max-w-3xl px-4 py-6 md:px-8 md:py-10">
       <Link
         href="/inbox"
-        className="mb-5 inline-flex items-center gap-1.5 text-[12.5px] text-muted-foreground transition-colors hover:text-foreground"
+        className="text-muted-foreground hover:text-foreground mb-5 inline-flex items-center gap-1.5 text-[12.5px] transition-colors"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
         Back to the inbox
@@ -191,15 +191,15 @@ export function PersonProfile({ data }: { data: PersonProfileData }) {
 
       {/* ---- Identity header ------------------------------------------- */}
       <div className="flex items-start gap-4">
-        <Avatar className="h-16 w-16 shrink-0 ring-1 ring-border">
+        <Avatar className="ring-border h-16 w-16 shrink-0 ring-1">
           {c.avatarUrl && <AvatarImage src={c.avatarUrl} alt={displayName} />}
-          <AvatarFallback className="bg-secondary text-lg font-semibold text-muted-foreground">
+          <AvatarFallback className="bg-secondary text-muted-foreground text-lg font-semibold">
             {initials(displayName)}
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-xl font-semibold tracking-[-0.01em]">{displayName}</h1>
-          <p className="mt-0.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[12.5px] text-muted-foreground">
+          <p className="text-muted-foreground mt-0.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[12.5px]">
             {c.company && <span>{c.company}</span>}
             {local && (
               <span className={cn(local.unsociable && 'text-warning')}>
@@ -218,7 +218,7 @@ export function PersonProfile({ data }: { data: PersonProfileData }) {
       </div>
 
       {/* ---- Relationship at a glance ----------------------------------- */}
-      <dl className="mt-6 grid grid-cols-2 gap-x-4 gap-y-3 rounded-xl border bg-surface p-4 sm:grid-cols-4">
+      <dl className="bg-surface mt-6 grid grid-cols-2 gap-x-4 gap-y-3 rounded-xl border p-4 sm:grid-cols-4">
         <Stat label="Messages" value={data.stats.totalMessages.toLocaleString()} />
         <Stat label="They sent" value={data.stats.inbound.toLocaleString()} />
         <Stat
@@ -236,14 +236,14 @@ export function PersonProfile({ data }: { data: PersonProfileData }) {
         <CardHeader>
           <CardTitle className="text-base">
             Conversations
-            <span className="ml-2 text-[12px] font-normal text-muted-foreground">
+            <span className="text-muted-foreground ml-2 text-[12px] font-normal">
               {data.conversations.length}
             </span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-1">
           {data.conversations.length === 0 ? (
-            <p className="text-[13px] text-muted-foreground">
+            <p className="text-muted-foreground text-[13px]">
               No threads yet. They exist as a contact, but nobody has texted them.
             </p>
           ) : (
@@ -251,9 +251,9 @@ export function PersonProfile({ data }: { data: PersonProfileData }) {
               <Link
                 key={conv.id}
                 href={`/inbox/${conv.id}`}
-                className="-mx-2 flex items-start gap-2.5 rounded-lg px-2 py-2 transition-colors hover:bg-accent"
+                className="hover:bg-accent -mx-2 flex items-start gap-2.5 rounded-lg px-2 py-2 transition-colors"
               >
-                <span className="mt-0.5 shrink-0 text-muted-foreground/70">
+                <span className="text-muted-foreground/70 mt-0.5 shrink-0">
                   {conv.isGroup ? (
                     <Users className="h-3.5 w-3.5" />
                   ) : (
@@ -281,11 +281,11 @@ export function PersonProfile({ data }: { data: PersonProfileData }) {
                       </Badge>
                     )}
                   </span>
-                  <span className="mt-0.5 block truncate text-[12px] text-muted-foreground">
+                  <span className="text-muted-foreground mt-0.5 block truncate text-[12px]">
                     {conv.lastMessagePreview || 'No messages yet'}
                   </span>
                 </span>
-                <span className="tabular shrink-0 text-[11.5px] text-muted-foreground/80">
+                <span className="tabular text-muted-foreground/80 shrink-0 text-[11.5px]">
                   {conv.lastMessageAt ? listTime(conv.lastMessageAt) : ''}
                 </span>
               </Link>
@@ -300,7 +300,12 @@ export function PersonProfile({ data }: { data: PersonProfileData }) {
           <CardTitle className="text-base">Details</CardTitle>
           {editing ? (
             <div className="flex items-center gap-1.5">
-              <Button size="sm" variant="ghost" disabled={pending} onClick={() => setEditing(false)}>
+              <Button
+                size="sm"
+                variant="ghost"
+                disabled={pending}
+                onClick={() => setEditing(false)}
+              >
                 Cancel
               </Button>
               <Button size="sm" loading={pending} onClick={save}>
@@ -359,13 +364,13 @@ export function PersonProfile({ data }: { data: PersonProfileData }) {
             <div className="space-y-3">
               <ReadRow label="Company" value={c.company} />
               <div>
-                <p className="text-[11.5px] text-muted-foreground/70">Notes</p>
+                <p className="text-muted-foreground/70 text-[11.5px]">Notes</p>
                 {c.notes ? (
                   <p className="mt-0.5 whitespace-pre-wrap text-[13px] leading-relaxed">
                     {c.notes}
                   </p>
                 ) : (
-                  <p className="mt-0.5 text-[13px] text-muted-foreground/60">None</p>
+                  <p className="text-muted-foreground/60 mt-0.5 text-[13px]">None</p>
                 )}
               </div>
             </div>
@@ -373,13 +378,13 @@ export function PersonProfile({ data }: { data: PersonProfileData }) {
 
           {/* ---- Addresses ---- */}
           <div className="space-y-2 border-t pt-4">
-            <p className="text-[11.5px] text-muted-foreground/70">Addresses</p>
+            <p className="text-muted-foreground/70 text-[11.5px]">Addresses</p>
             {data.identities.map((i) => (
               <div key={i.id} className="group flex items-center gap-2.5">
                 {i.kind === 'email' ? (
-                  <Mail className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70" />
+                  <Mail className="text-muted-foreground/70 h-3.5 w-3.5 shrink-0" />
                 ) : (
-                  <Phone className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70" />
+                  <Phone className="text-muted-foreground/70 h-3.5 w-3.5 shrink-0" />
                 )}
                 <span className="flex-1 truncate text-[13px]">
                   {formatAddress(i.rawValue ?? i.value) ?? i.value}
@@ -392,7 +397,7 @@ export function PersonProfile({ data }: { data: PersonProfileData }) {
                       apply(() => removeContactIdentity({ contactId: c.id, identityId: i.id }))
                     }
                     aria-label={`Remove ${i.value}`}
-                    className="rounded p-1 text-muted-foreground/50 transition-colors hover:bg-accent hover:text-destructive"
+                    className="text-muted-foreground/50 hover:bg-accent hover:text-destructive rounded p-1 transition-colors"
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
@@ -430,10 +435,9 @@ export function PersonProfile({ data }: { data: PersonProfileData }) {
                     Add
                   </Button>
                 </form>
-                <p className="text-[11.5px] leading-relaxed text-muted-foreground/70">
-                  Adding an address merges their history — the same person texting from two
-                  numbers stops being two strangers. Addresses save as soon as you add or remove
-                  them.
+                <p className="text-muted-foreground/70 text-[11.5px] leading-relaxed">
+                  Adding an address merges their history — the same person texting from two numbers
+                  stops being two strangers. Addresses save as soon as you add or remove them.
                 </p>
               </>
             )}
@@ -441,18 +445,18 @@ export function PersonProfile({ data }: { data: PersonProfileData }) {
 
           {/* ---- Custom fields ---- */}
           <div className="space-y-2 border-t pt-4">
-            <p className="text-[11.5px] text-muted-foreground/70">Custom fields</p>
+            <p className="text-muted-foreground/70 text-[11.5px]">Custom fields</p>
             {attributes.length === 0 && !editing && (
-              <p className="text-[13px] text-muted-foreground/60">None</p>
+              <p className="text-muted-foreground/60 text-[13px]">None</p>
             )}
             {attributes.length === 0 && editing && (
-              <p className="text-[11.5px] text-muted-foreground/70">
+              <p className="text-muted-foreground/70 text-[11.5px]">
                 Anything you want to track — plan, renewal date, who owns the account.
               </p>
             )}
             {attributes.map(([k, v]) => (
               <div key={k} className="flex items-center gap-2.5">
-                <span className="w-32 shrink-0 truncate text-[12px] text-muted-foreground">
+                <span className="text-muted-foreground w-32 shrink-0 truncate text-[12px]">
                   {k}
                 </span>
                 <span className="flex-1 truncate text-[13px]">{v}</span>
@@ -464,7 +468,7 @@ export function PersonProfile({ data }: { data: PersonProfileData }) {
                       apply(() => setContactAttribute({ contactId: c.id, key: k, value: '' }))
                     }
                     aria-label={`Remove ${k}`}
-                    className="rounded p-1 text-muted-foreground/50 transition-colors hover:bg-accent hover:text-destructive"
+                    className="text-muted-foreground/50 hover:bg-accent hover:text-destructive rounded p-1 transition-colors"
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
@@ -479,7 +483,8 @@ export function PersonProfile({ data }: { data: PersonProfileData }) {
                   e.preventDefault();
                   if (!fieldKey.trim() || !fieldValue.trim()) return;
                   apply(
-                    () => setContactAttribute({ contactId: c.id, key: fieldKey, value: fieldValue }),
+                    () =>
+                      setContactAttribute({ contactId: c.id, key: fieldKey, value: fieldValue }),
                     () => {
                       setFieldKey('');
                       setFieldValue('');
@@ -519,9 +524,9 @@ export function PersonProfile({ data }: { data: PersonProfileData }) {
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-medium">Opted out</p>
-                  <p className="text-xs text-muted-foreground">
-                    Blocks every outbound message to them, including automations. Set
-                    automatically when someone replies STOP.
+                  <p className="text-muted-foreground text-xs">
+                    Blocks every outbound message to them, including automations. Set automatically
+                    when someone replies STOP.
                   </p>
                 </div>
                 <Switch
@@ -545,9 +550,9 @@ export function PersonProfile({ data }: { data: PersonProfileData }) {
         <Card className="mt-4">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <Images className="h-4 w-4 text-muted-foreground" />
+              <Images className="text-muted-foreground h-4 w-4" />
               Photos
-              <span className="text-[12px] font-normal text-muted-foreground">
+              <span className="text-muted-foreground text-[12px] font-normal">
                 {data.photoCount}
               </span>
             </CardTitle>
@@ -567,7 +572,7 @@ export function PersonProfile({ data }: { data: PersonProfileData }) {
                     src={`/api/attachments/${a.id}`}
                     alt={a.fileName ?? 'Shared photo'}
                     loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-300 ease-smooth group-hover:scale-105"
+                    className="ease-smooth h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 </Link>
               ))}
@@ -587,7 +592,7 @@ function primaryAddress(data: PersonProfileData): string {
 function ReadRow({ label, value }: { label: string; value: string | null }) {
   return (
     <div>
-      <p className="text-[11.5px] text-muted-foreground/70">{label}</p>
+      <p className="text-muted-foreground/70 text-[11.5px]">{label}</p>
       <p className={cn('mt-0.5 text-[13px]', !value && 'text-muted-foreground/60')}>
         {value || 'None'}
       </p>
@@ -598,7 +603,7 @@ function ReadRow({ label, value }: { label: string; value: string | null }) {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0">
-      <dt className="truncate text-[11.5px] text-muted-foreground/70">{label}</dt>
+      <dt className="text-muted-foreground/70 truncate text-[11.5px]">{label}</dt>
       <dd className="mt-px truncate text-[14px] font-medium">{value}</dd>
     </div>
   );

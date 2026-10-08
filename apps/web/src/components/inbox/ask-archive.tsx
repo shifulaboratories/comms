@@ -48,7 +48,7 @@ export function AskArchive() {
   return (
     <div className="space-y-4">
       <div className="relative">
-        <Sparkles className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-muted-foreground/70" />
+        <Sparkles className="text-muted-foreground/70 pointer-events-none absolute left-3 top-3.5 h-4 w-4" />
         <textarea
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
@@ -60,14 +60,14 @@ export function AskArchive() {
           }}
           rows={2}
           placeholder="Ask anything about your messages…"
-          className="type-body w-full resize-none rounded-xl border bg-surface py-3 pl-10 pr-12 outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-brand"
+          className="type-body bg-surface placeholder:text-muted-foreground/60 focus:border-brand w-full resize-none rounded-xl border py-3 pl-10 pr-12 outline-none transition-colors"
         />
         <button
           type="button"
           onClick={() => ask(question)}
           disabled={!question.trim() || pending}
           aria-label="Ask"
-          className="absolute right-2.5 top-2.5 grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-foreground transition-opacity disabled:opacity-30"
+          className="bg-primary text-primary-foreground absolute right-2.5 top-2.5 grid h-8 w-8 place-items-center rounded-lg transition-opacity disabled:opacity-30"
         >
           {pending ? (
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -87,7 +87,7 @@ export function AskArchive() {
                 setQuestion(e);
                 ask(e);
               }}
-              className="type-caption rounded-full border px-2.5 py-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              className="type-caption text-muted-foreground hover:bg-accent hover:text-foreground rounded-full border px-2.5 py-1 transition-colors"
             >
               {e}
             </button>
@@ -96,48 +96,46 @@ export function AskArchive() {
       )}
 
       {pending && (
-        <p className="type-body flex items-center gap-2 text-muted-foreground">
+        <p className="type-body text-muted-foreground flex items-center gap-2">
           <Loader2 className="h-3.5 w-3.5 animate-spin" />
           Reading your messages…
         </p>
       )}
 
       {error && (
-        <p className="type-body rounded-xl border border-destructive/40 bg-destructive-muted px-3 py-2 text-destructive">
+        <p className="type-body border-destructive/40 bg-destructive-muted text-destructive rounded-xl border px-3 py-2">
           {error}
         </p>
       )}
 
       {answer && (
         <div className="space-y-3">
-          <div className="rounded-xl border bg-surface p-4">
+          <div className="bg-surface rounded-xl border p-4">
             <p className="type-body whitespace-pre-wrap">{answer}</p>
           </div>
 
           {sources.length > 0 && (
             <div>
-              <p className="type-micro pb-1.5 text-muted-foreground/60">
-                From these conversations
-              </p>
+              <p className="type-micro text-muted-foreground/60 pb-1.5">From these conversations</p>
               <div className="divide-y rounded-xl border">
                 {sources.map((s) => (
                   <Link
                     key={s.index}
                     href={`/inbox/${s.conversationId}`}
                     className={cn(
-                      'flex items-start gap-2.5 px-3 py-2.5 transition-colors hover:bg-accent/60',
+                      'hover:bg-accent/60 flex items-start gap-2.5 px-3 py-2.5 transition-colors',
                     )}
                   >
-                    <span className="type-caption tabular mt-0.5 shrink-0 text-muted-foreground/60">
+                    <span className="type-caption tabular text-muted-foreground/60 mt-0.5 shrink-0">
                       [{s.index}]
                     </span>
                     <span className="min-w-0">
                       <span className="type-title block truncate">{s.conversationName}</span>
-                      <span className="type-body block truncate text-muted-foreground">
+                      <span className="type-body text-muted-foreground block truncate">
                         {s.snippet}
                       </span>
                     </span>
-                    <span className="type-caption tabular ml-auto shrink-0 text-muted-foreground/60">
+                    <span className="type-caption tabular text-muted-foreground/60 ml-auto shrink-0">
                       {s.at}
                     </span>
                   </Link>

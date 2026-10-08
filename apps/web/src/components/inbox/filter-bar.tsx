@@ -114,13 +114,7 @@ export function useInboxFilters() {
   return { filters, setParam, toggleInList, activeCount, clearAll };
 }
 
-function FilterChip({
-  label,
-  onClear,
-}: {
-  label: string;
-  onClear: () => void;
-}) {
+function FilterChip({ label, onClear }: { label: string; onClear: () => void }) {
   return (
     <motion.button
       layout
@@ -128,10 +122,10 @@ function FilterChip({
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
       onClick={onClear}
-      className="group flex shrink-0 items-center gap-1 rounded-md border bg-secondary px-1.5 py-0.5 text-[11px] font-medium transition-colors hover:border-border-strong"
+      className="bg-secondary hover:border-border-strong group flex shrink-0 items-center gap-1 rounded-md border px-1.5 py-0.5 text-[11px] font-medium transition-colors"
     >
       {label}
-      <X className="h-3 w-3 text-muted-foreground transition-colors group-hover:text-foreground" />
+      <X className="text-muted-foreground group-hover:text-foreground h-3 w-3 transition-colors" />
     </motion.button>
   );
 }
@@ -207,7 +201,7 @@ export function FilterBar({
             <ListFilter className="h-3.5 w-3.5" />
             Filter
             {activeCount > 0 && (
-              <span className="tabular rounded bg-primary px-1 text-[10px] text-primary-foreground">
+              <span className="tabular bg-primary text-primary-foreground rounded px-1 text-[10px]">
                 {activeCount}
               </span>
             )}
@@ -215,7 +209,7 @@ export function FilterBar({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-60">
-          <DropdownMenuLabel className="text-[10.5px] uppercase tracking-wide text-muted-foreground">
+          <DropdownMenuLabel className="text-muted-foreground text-[10.5px] uppercase tracking-wide">
             Status
           </DropdownMenuLabel>
           {STATUSES.map((s) => (
@@ -229,7 +223,7 @@ export function FilterBar({
           ))}
 
           <DropdownMenuSeparator />
-          <DropdownMenuLabel className="text-[10.5px] uppercase tracking-wide text-muted-foreground">
+          <DropdownMenuLabel className="text-muted-foreground text-[10.5px] uppercase tracking-wide">
             Priority
           </DropdownMenuLabel>
           {PRIORITIES.map((p) => (
@@ -249,7 +243,7 @@ export function FilterBar({
           {allTags.length > 0 && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuLabel className="text-[10.5px] uppercase tracking-wide text-muted-foreground">
+              <DropdownMenuLabel className="text-muted-foreground text-[10.5px] uppercase tracking-wide">
                 Tags
               </DropdownMenuLabel>
               <div className="max-h-40 overflow-y-auto">
@@ -274,7 +268,9 @@ export function FilterBar({
           )}
 
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setParam('sla', filters.slaBreached ? null : 'breached')}>
+          <DropdownMenuItem
+            onClick={() => setParam('sla', filters.slaBreached ? null : 'breached')}
+          >
             <span className="flex-1">Breaching SLA</span>
             {filters.slaBreached && <Check className="h-3.5 w-3.5" />}
           </DropdownMenuItem>
@@ -289,7 +285,7 @@ export function FilterBar({
           </DropdownMenuItem>
 
           <DropdownMenuSeparator />
-          <DropdownMenuLabel className="text-[10.5px] uppercase tracking-wide text-muted-foreground">
+          <DropdownMenuLabel className="text-muted-foreground text-[10.5px] uppercase tracking-wide">
             Who it&apos;s with
           </DropdownMenuLabel>
           {KINDS.map((k) => (
@@ -305,7 +301,7 @@ export function FilterBar({
           {inboxes.length > 1 && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuLabel className="text-[10.5px] uppercase tracking-wide text-muted-foreground">
+              <DropdownMenuLabel className="text-muted-foreground text-[10.5px] uppercase tracking-wide">
                 Channel
               </DropdownMenuLabel>
               {inboxes.map((i) => (
@@ -324,7 +320,7 @@ export function FilterBar({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button size="xs" variant="ghost" className="gap-1 text-muted-foreground">
+          <Button size="xs" variant="ghost" className="text-muted-foreground gap-1">
             <ArrowDownUp className="h-3.5 w-3.5" />
             {SORTS.find((s) => s.key === filters.sort)?.label ?? 'Newest first'}
           </Button>
@@ -395,11 +391,7 @@ export function FilterBar({
           />
         )}
         {filters.readNoReply && (
-          <FilterChip
-            key="seen"
-            label="Read, no reply"
-            onClear={() => setParam('seen', null)}
-          />
+          <FilterChip key="seen" label="Read, no reply" onClear={() => setParam('seen', null)} />
         )}
         {filters.unreadOnly && (
           <FilterChip key="unread" label="Unread" onClear={() => setParam('unread', null)} />
@@ -410,14 +402,14 @@ export function FilterBar({
         <>
           <button
             onClick={clearAll}
-            className="shrink-0 text-[11px] text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+            className="text-muted-foreground hover:text-foreground shrink-0 text-[11px] underline-offset-2 hover:underline"
           >
             Clear
           </button>
           <Button
             size="xs"
             variant="ghost"
-            className="ml-auto gap-1 text-muted-foreground"
+            className="text-muted-foreground ml-auto gap-1"
             onClick={() => {
               setViewName('');
               setDisplay('sidebar');
@@ -474,12 +466,12 @@ export function FilterBar({
                   >
                     {o.label}
                   </span>
-                  <span className="block text-[10.5px] text-muted-foreground">{o.hint}</span>
+                  <span className="text-muted-foreground block text-[10.5px]">{o.hint}</span>
                 </button>
               ))}
             </div>
 
-            <p className="text-[11.5px] text-muted-foreground">
+            <p className="text-muted-foreground text-[11.5px]">
               Membership is computed, so it already contains everything that matches — and threads
               leave on their own when they stop. {searchParams.size} filter
               {searchParams.size === 1 ? '' : 's'} included.

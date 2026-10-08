@@ -30,29 +30,29 @@ export function UserMenu({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="group flex w-full items-center gap-2.5 rounded-lg p-2 text-left transition-colors duration-150 hover:bg-accent data-[state=open]:bg-accent">
-        <Avatar className="h-7 w-7 ring-1 ring-border">
+      <DropdownMenuTrigger className="hover:bg-accent data-[state=open]:bg-accent group flex w-full items-center gap-2.5 rounded-lg p-2 text-left transition-colors duration-150">
+        <Avatar className="ring-border h-7 w-7 ring-1">
           {user.image && <AvatarImage src={user.image} alt={user.name ?? ''} />}
-          <AvatarFallback className="bg-brand-muted text-[11px] font-semibold text-brand">
+          <AvatarFallback className="bg-brand-muted text-brand text-[11px] font-semibold">
             {initials(user.name)}
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
           <p className="truncate text-[13px] font-medium leading-tight">{user.name ?? 'Account'}</p>
-          <p className="truncate text-[11px] leading-tight text-muted-foreground">{user.email}</p>
+          <p className="text-muted-foreground truncate text-[11px] leading-tight">{user.email}</p>
         </div>
-        <ChevronsUpDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60 transition-colors group-hover:text-muted-foreground" />
+        <ChevronsUpDown className="text-muted-foreground/60 group-hover:text-muted-foreground h-3.5 w-3.5 shrink-0 transition-colors" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" side="top" className="w-60">
-        <DropdownMenuLabel className="truncate text-xs font-normal text-muted-foreground">
+        <DropdownMenuLabel className="text-muted-foreground truncate text-xs font-normal">
           {user.email}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
         {/* Segmented theme control — one row, no nested submenu to hunt through. */}
         <div className="px-1 py-1">
-          <div className="flex items-center gap-1 rounded-lg bg-secondary/70 p-0.5">
+          <div className="bg-secondary/70 flex items-center gap-1 rounded-lg p-0.5">
             {THEMES.map((t) => {
               const Icon = t.icon;
               const active = theme === t.value;
@@ -62,7 +62,7 @@ export function UserMenu({
                   type="button"
                   onClick={() => setTheme(t.value)}
                   className={cn(
-                    'flex flex-1 items-center justify-center gap-1.5 rounded-[0.4rem] px-2 py-1.5 text-[11px] font-medium transition-all duration-200 ease-smooth',
+                    'ease-smooth flex flex-1 items-center justify-center gap-1.5 rounded-[0.4rem] px-2 py-1.5 text-[11px] font-medium transition-all duration-200',
                     active
                       ? 'bg-surface text-foreground shadow-xs'
                       : 'text-muted-foreground hover:text-foreground',

@@ -163,7 +163,7 @@
 
   /* One consistent focus treatment across every interactive element. */
   :focus-visible {
-    @apply outline-none ring-2 ring-ring/50 ring-offset-2 ring-offset-background;
+    @apply ring-ring/50 ring-offset-background outline-none ring-2 ring-offset-2;
   }
 
   ::-webkit-scrollbar {
@@ -174,7 +174,7 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    @apply rounded-full border-[3px] border-solid border-transparent bg-border-strong;
+    @apply bg-border-strong rounded-full border-[3px] border-solid border-transparent;
     background-clip: content-box;
   }
   ::-webkit-scrollbar-thumb:hover {

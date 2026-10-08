@@ -82,7 +82,7 @@ export function AiAssist({
         type="button"
         variant="ghost"
         size="xs"
-        className="gap-1.5 text-brand hover:bg-brand-muted hover:text-brand"
+        className="text-brand hover:bg-brand-muted hover:text-brand gap-1.5"
         onClick={suggest}
         loading={pending && active === 'suggest'}
         disabled={pending}
@@ -112,12 +112,12 @@ export function AiAssist({
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <span className="grid h-7 w-7 place-items-center rounded-lg bg-brand-muted text-brand">
+              <span className="bg-brand-muted text-brand grid h-7 w-7 place-items-center rounded-lg">
                 <Sparkles className="h-3.5 w-3.5" />
               </span>
               Conversation summary
             </DialogTitle>
-            <DialogDescription className="whitespace-pre-wrap pt-2 text-[13.5px] leading-relaxed text-foreground">
+            <DialogDescription className="text-foreground whitespace-pre-wrap pt-2 text-[13.5px] leading-relaxed">
               {summary}
             </DialogDescription>
           </DialogHeader>

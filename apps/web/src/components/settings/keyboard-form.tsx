@@ -34,9 +34,7 @@ import { cn } from '@/lib/utils';
  */
 export function KeyboardForm({ preference }: { preference: KeymapPreference | null }) {
   const [preset, setPreset] = useState<PresetId>(
-    (preference?.preset as PresetId) in PRESETS
-      ? (preference!.preset as PresetId)
-      : DEFAULT_PRESET,
+    (preference?.preset as PresetId) in PRESETS ? (preference!.preset as PresetId) : DEFAULT_PRESET,
   );
   const [keymap, setKeymap] = useState<Keymap>(() => resolveKeymap(preference));
   const [enterSends, setEnterSends] = useState(() => resolveEnterSends(preference));
@@ -133,7 +131,7 @@ export function KeyboardForm({ preference }: { preference: KeymapPreference | nu
       <section className="space-y-3">
         <div>
           <h3 className="text-sm font-medium">Preset</h3>
-          <p className="text-[13px] text-muted-foreground">
+          <p className="text-muted-foreground text-[13px]">
             A starting point modelled on the app you already have in muscle memory. Every key stays
             editable afterwards.
           </p>
@@ -145,7 +143,7 @@ export function KeyboardForm({ preference }: { preference: KeymapPreference | nu
               type="button"
               onClick={() => applyPreset(id)}
               className={cn(
-                'rounded-xl border p-3 text-left transition-colors hover:bg-accent/60',
+                'hover:bg-accent/60 rounded-xl border p-3 text-left transition-colors',
                 preset === id && 'border-foreground bg-accent/40',
               )}
             >
@@ -153,7 +151,7 @@ export function KeyboardForm({ preference }: { preference: KeymapPreference | nu
                 {PRESETS[id].label}
                 {preset === id && <Check className="h-3.5 w-3.5" />}
               </span>
-              <span className="mt-1 block text-[11.5px] leading-snug text-muted-foreground">
+              <span className="text-muted-foreground mt-1 block text-[11.5px] leading-snug">
                 {PRESETS[id].description}
               </span>
             </button>
@@ -164,7 +162,7 @@ export function KeyboardForm({ preference }: { preference: KeymapPreference | nu
       <section className="flex items-start justify-between gap-4 rounded-xl border p-3">
         <div>
           <p className="text-[13px] font-medium">Enter sends the message</p>
-          <p className="text-[12px] text-muted-foreground">
+          <p className="text-muted-foreground text-[12px]">
             {enterSends
               ? 'Shift + Enter inserts a new line.'
               : 'Enter inserts a new line; ⌘ + Enter sends.'}
@@ -184,7 +182,9 @@ export function KeyboardForm({ preference }: { preference: KeymapPreference | nu
           <AlertTriangle className="mt-px h-4 w-4 shrink-0 text-amber-600 dark:text-amber-500" />
           <div>
             <p className="font-medium">
-              {conflicts.length === 1 ? 'One shortcut conflicts' : `${conflicts.length} shortcuts conflict`}
+              {conflicts.length === 1
+                ? 'One shortcut conflicts'
+                : `${conflicts.length} shortcuts conflict`}
             </p>
             <p className="text-muted-foreground">
               Two actions share a key, or one key is the start of another sequence. Only the first
@@ -205,7 +205,7 @@ export function KeyboardForm({ preference }: { preference: KeymapPreference | nu
         <div className="space-y-5">
           {(Object.keys(groups) as KeyActionGroup[]).map((group) => (
             <div key={group}>
-              <p className="pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+              <p className="text-muted-foreground/70 pb-1.5 text-[10px] font-semibold uppercase tracking-wider">
                 {group}
               </p>
               <div className="divide-y rounded-xl border">
@@ -228,7 +228,7 @@ export function KeyboardForm({ preference }: { preference: KeymapPreference | nu
                           {action.label}
                         </p>
                         {action.hint && (
-                          <p className="text-[11.5px] text-muted-foreground">{action.hint}</p>
+                          <p className="text-muted-foreground text-[11.5px]">{action.hint}</p>
                         )}
                       </div>
 
@@ -236,14 +236,14 @@ export function KeyboardForm({ preference }: { preference: KeymapPreference | nu
                         {bindings.map((binding) => (
                           <span
                             key={binding}
-                            className="group flex items-center gap-1 rounded-lg border bg-secondary/60 py-0.5 pl-1.5 pr-0.5"
+                            className="bg-secondary/60 group flex items-center gap-1 rounded-lg border py-0.5 pl-1.5 pr-0.5"
                           >
                             <BindingKeys binding={binding} isMac={isMac} />
                             <button
                               type="button"
                               aria-label={`Remove ${binding}`}
                               onClick={() => removeBinding(action.id, binding)}
-                              className="grid h-5 w-5 place-items-center rounded text-muted-foreground/60 transition-colors hover:bg-destructive/10 hover:text-destructive"
+                              className="text-muted-foreground/60 hover:bg-destructive/10 hover:text-destructive grid h-5 w-5 place-items-center rounded transition-colors"
                             >
                               <X className="h-3 w-3" />
                             </button>
@@ -251,11 +251,11 @@ export function KeyboardForm({ preference }: { preference: KeymapPreference | nu
                         ))}
 
                         {bindings.length === 0 && !isRecording && (
-                          <span className="text-[11.5px] text-muted-foreground/60">Not set</span>
+                          <span className="text-muted-foreground/60 text-[11.5px]">Not set</span>
                         )}
 
                         {isRecording ? (
-                          <span className="animate-pulse rounded-lg border border-foreground px-2 py-1 text-[11.5px]">
+                          <span className="border-foreground animate-pulse rounded-lg border px-2 py-1 text-[11.5px]">
                             Press keys… <span className="text-muted-foreground">Esc to cancel</span>
                           </span>
                         ) : (
@@ -276,7 +276,7 @@ export function KeyboardForm({ preference }: { preference: KeymapPreference | nu
                           variant="ghost"
                           size="sm"
                           aria-label={`Reset ${action.label}`}
-                          className="h-7 w-7 p-0 text-muted-foreground"
+                          className="text-muted-foreground h-7 w-7 p-0"
                           onClick={() => resetAction(action.id)}
                         >
                           <RotateCcw className="h-3 w-3" />
@@ -304,7 +304,7 @@ export function KeyboardForm({ preference }: { preference: KeymapPreference | nu
               setPreset((preference?.preset as PresetId) ?? DEFAULT_PRESET);
               setDirty(false);
             }}
-            className="text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground text-[13px] transition-colors"
           >
             Discard changes
           </button>

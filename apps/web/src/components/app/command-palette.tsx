@@ -26,10 +26,7 @@ export function CommandPalette({
   isAdmin?: boolean;
 }) {
   const router = useRouter();
-  const tagNameToId = useMemo(
-    () => new Map(tags.map((t) => [t.name.toLowerCase(), t.id])),
-    [tags],
-  );
+  const tagNameToId = useMemo(() => new Map(tags.map((t) => [t.name.toLowerCase(), t.id])), [tags]);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [hits, setHits] = useState<SearchHit[]>([]);
@@ -158,22 +155,22 @@ export function CommandPalette({
       <DialogContent className="top-[18%] max-w-lg translate-y-0 gap-0 overflow-hidden p-0">
         <DialogTitle className="sr-only">Command palette</DialogTitle>
         <div className="flex items-center gap-2.5 border-b px-3.5">
-          <Search className="h-[15px] w-[15px] shrink-0 text-muted-foreground" />
+          <Search className="text-muted-foreground h-[15px] w-[15px] shrink-0" />
           <input
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={onKeyDown}
             placeholder="Search, or try tag:billing  status:open  is:unread"
-            className="h-[52px] w-full bg-transparent text-[13.5px] outline-none placeholder:text-muted-foreground/70"
+            className="placeholder:text-muted-foreground/70 h-[52px] w-full bg-transparent text-[13.5px] outline-none"
           />
-          <kbd className="shrink-0 rounded border bg-secondary px-1.5 py-0.5 text-[10px] text-muted-foreground">
+          <kbd className="bg-secondary text-muted-foreground shrink-0 rounded border px-1.5 py-0.5 text-[10px]">
             ESC
           </kbd>
         </div>
         <div className="max-h-80 overflow-y-auto p-1.5">
           {items.length === 0 ? (
-            <p className="px-3 py-8 text-center text-[13px] text-muted-foreground">No results.</p>
+            <p className="text-muted-foreground px-3 py-8 text-center text-[13px]">No results.</p>
           ) : (
             items.map((it, i) => {
               const Icon = it.icon;
@@ -210,14 +207,14 @@ export function CommandPalette({
             })
           )}
         </div>
-        <div className="flex items-center gap-3 border-t bg-surface-sunken px-3.5 py-2 text-[10.5px] text-muted-foreground">
+        <div className="bg-surface-sunken text-muted-foreground flex items-center gap-3 border-t px-3.5 py-2 text-[10.5px]">
           <span className="flex items-center gap-1">
-            <kbd className="rounded border bg-surface px-1">↑</kbd>
-            <kbd className="rounded border bg-surface px-1">↓</kbd>
+            <kbd className="bg-surface rounded border px-1">↑</kbd>
+            <kbd className="bg-surface rounded border px-1">↓</kbd>
             navigate
           </span>
           <span className="flex items-center gap-1">
-            <kbd className="rounded border bg-surface px-1">↵</kbd>
+            <kbd className="bg-surface rounded border px-1">↵</kbd>
             open
           </span>
         </div>

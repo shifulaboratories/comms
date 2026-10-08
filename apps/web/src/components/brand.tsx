@@ -21,7 +21,7 @@ export function Logo({
     <div className={cn('flex items-center gap-2.5', className)}>
       <div
         className={cn(
-          'flex items-center justify-center bg-primary text-primary-foreground',
+          'bg-primary text-primary-foreground flex items-center justify-center',
           radius,
           mark,
         )}
@@ -33,9 +33,7 @@ export function Logo({
           />
         </svg>
       </div>
-      {showWordmark && (
-        <span className={cn('font-semibold tracking-[-0.02em]', text)}>Comms</span>
-      )}
+      {showWordmark && <span className={cn('font-semibold tracking-[-0.02em]', text)}>Comms</span>}
     </div>
   );
 }

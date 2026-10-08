@@ -41,7 +41,7 @@ export function PresenceBar({ conversationId }: { conversationId: string }) {
     >
       <div className="flex -space-x-1.5">
         {list.slice(0, 3).map((p) => (
-          <Avatar key={p.userId} className="h-5 w-5 ring-2 ring-surface">
+          <Avatar key={p.userId} className="ring-surface h-5 w-5 ring-2">
             <AvatarFallback className="bg-secondary text-[9px] font-semibold">
               {initials(p.name)}
             </AvatarFallback>
@@ -56,7 +56,7 @@ export function PresenceBar({ conversationId }: { conversationId: string }) {
             {[0, 1, 2].map((i) => (
               <span
                 key={i}
-                className="h-1 w-1 animate-typing-dot rounded-full bg-current"
+                className="animate-typing-dot h-1 w-1 rounded-full bg-current"
                 style={{ animationDelay: `${i * 160}ms` }}
               />
             ))}

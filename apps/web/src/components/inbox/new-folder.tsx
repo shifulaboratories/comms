@@ -41,7 +41,10 @@ type SourceKind =
   | null;
 
 /** What the advanced builder starts with — one empty row, not zero. */
-const EMPTY_QUERY: FolderQuery = { match: 'all', conditions: [{ field: 'kind', operator: 'is', value: '' }] };
+const EMPTY_QUERY: FolderQuery = {
+  match: 'all',
+  conditions: [{ field: 'kind', operator: 'is', value: '' }],
+};
 
 /** One-tap starting points — the folders nearly every workspace wants. */
 const PRESETS: {
@@ -149,7 +152,11 @@ export function NewFolderDialog({
     }
   }
 
-  function create(overrides?: { name: string; source: SourceKind; display: 'sidebar' | 'section' }) {
+  function create(overrides?: {
+    name: string;
+    source: SourceKind;
+    display: 'sidebar' | 'section';
+  }) {
     const finalName = (overrides?.name ?? name).trim();
     const finalSource = overrides?.source ?? source;
     const finalDisplay = overrides?.display ?? display;
@@ -196,7 +203,7 @@ export function NewFolderDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <span className="grid h-7 w-7 place-items-center rounded-lg bg-brand-muted text-brand">
+            <span className="bg-brand-muted text-brand grid h-7 w-7 place-items-center rounded-lg">
               <Folder className="h-3.5 w-3.5" />
             </span>
             New folder
@@ -206,22 +213,20 @@ export function NewFolderDialog({
         <div className="space-y-4 py-1">
           {/* Presets first: most people want one of these four and nothing else. */}
           <div>
-            <p className="type-micro mb-1.5 text-muted-foreground/70">Start from</p>
+            <p className="type-micro text-muted-foreground/70 mb-1.5">Start from</p>
             <div className="grid grid-cols-2 gap-1.5">
               {PRESETS.map((p) => (
                 <button
                   key={p.key}
                   type="button"
                   disabled={pending}
-                  onClick={() =>
-                    create({ name: p.name, source: p.source, display: p.display })
-                  }
-                  className="flex items-start gap-2 rounded-lg border px-2.5 py-2 text-left transition-all hover:border-border-strong hover:bg-accent active:scale-[0.98] disabled:opacity-60"
+                  onClick={() => create({ name: p.name, source: p.source, display: p.display })}
+                  className="hover:border-border-strong hover:bg-accent flex items-start gap-2 rounded-lg border px-2.5 py-2 text-left transition-all active:scale-[0.98] disabled:opacity-60"
                 >
-                  <p.icon className="mt-px h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                  <p.icon className="text-muted-foreground mt-px h-3.5 w-3.5 shrink-0" />
                   <span className="min-w-0">
                     <span className="block truncate text-[12.5px] font-medium">{p.name}</span>
-                    <span className="block truncate text-[10.5px] text-muted-foreground">
+                    <span className="text-muted-foreground block truncate text-[10.5px]">
                       {p.hint}
                     </span>
                   </span>
@@ -231,8 +236,8 @@ export function NewFolderDialog({
           </div>
 
           <div className="relative">
-            <div className="h-px bg-border" />
-            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface px-2 text-[10.5px] uppercase tracking-wide text-muted-foreground/60">
+            <div className="bg-border h-px" />
+            <span className="bg-surface text-muted-foreground/60 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 px-2 text-[10.5px] uppercase tracking-wide">
               or build one
             </span>
           </div>
@@ -283,7 +288,7 @@ export function NewFolderDialog({
                 covers most folders, and a grid of dropdowns sitting open
                 makes the simple case look like the hard one. */}
             {source?.type === 'query' ? (
-              <div className="mt-2 rounded-lg border bg-secondary/40 p-2.5">
+              <div className="bg-secondary/40 mt-2 rounded-lg border p-2.5">
                 <QueryBuilder
                   query={source.value}
                   onChange={(q) => setSource({ type: 'query', value: q })}
@@ -292,7 +297,7 @@ export function NewFolderDialog({
                   agents={agents}
                 />
                 {sanitizeQuery(source.value) && (
-                  <p className="mt-2 border-t pt-2 text-[11px] text-muted-foreground">
+                  <p className="text-muted-foreground mt-2 border-t pt-2 text-[11px]">
                     Contains conversations where{' '}
                     <span className="text-foreground">
                       {describeQuery(sanitizeQuery(source.value)!)}
@@ -305,7 +310,7 @@ export function NewFolderDialog({
               <button
                 type="button"
                 onClick={() => setSource({ type: 'query', value: EMPTY_QUERY })}
-                className="mt-1.5 flex items-center gap-1.5 rounded-md px-1.5 py-1 text-[12px] font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                className="text-muted-foreground hover:bg-accent hover:text-foreground mt-1.5 flex items-center gap-1.5 rounded-md px-1.5 py-1 text-[12px] font-medium transition-colors"
               >
                 <SlidersHorizontal className="h-3 w-3" />
                 …or build a rule with and / or
@@ -341,7 +346,7 @@ export function NewFolderDialog({
                   >
                     {o.label}
                   </span>
-                  <span className="block text-[10.5px] text-muted-foreground">{o.hint}</span>
+                  <span className="text-muted-foreground block text-[10.5px]">{o.hint}</span>
                 </button>
               ))}
             </div>
@@ -384,9 +389,7 @@ function Chip({
       )}
     >
       <span className="flex items-center gap-1.5">
-        {color && (
-          <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} />
-        )}
+        {color && <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} />}
         {children}
       </span>
     </button>
