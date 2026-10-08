@@ -7,6 +7,8 @@
   "scripts": {
     "dev": "next dev -p ${PORT:-3001}",
     "build": "next build",
+    "build:static": "STATIC_EXPORT=1 next build",
+    "deploy:cloudflare": "STATIC_EXPORT=1 next build && npx wrangler@4 deploy",
     "start": "next start -p ${PORT:-3001} -H ${BIND_HOST:-0.0.0.0}",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"

@@ -15,10 +15,13 @@ export const site = {
   github: 'https://github.com/stratshq/comms',
   docs: 'https://github.com/stratshq/comms#readme',
   license: 'https://github.com/stratshq/comms/blob/main/LICENSE',
+  /** Where "Start a trial" goes until Cloud signup has its own page. */
+  trial: '/pricing#cloud',
 } as const;
 
 export const nav = [
+  { label: 'Product', href: '/#product' },
+  { label: 'Features', href: '/#features' },
+  { label: 'Deploy', href: '/#deploy' },
   { label: 'Pricing', href: '/pricing' },
-  { label: 'Docs', href: site.docs },
-  { label: 'GitHub', href: site.github },
 ] as const;

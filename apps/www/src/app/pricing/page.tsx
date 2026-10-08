@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { site } from '@/lib/site';
+import { SpotlightGroup } from '@/components/ui/spotlight';
+import { Check } from '@/components/ui/icons';
 
 export const metadata: Metadata = {
   title: 'Pricing',
@@ -88,32 +90,26 @@ const faqs = [
   },
 ] as const;
 
-function Check() {
-  return (
-    <svg
-      viewBox="0 0 16 16"
-      aria-hidden="true"
-      className="text-foreground mt-[3px] h-3.5 w-3.5 shrink-0"
-    >
-      <path
-        d="M3 8.5l3.2 3.2L13 5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 export default function PricingPage() {
   return (
     <>
-      <section className="container pb-12 pt-16 sm:pt-24">
-        <div className="max-w-2xl">
-          <h1 className="text-4xl sm:text-5xl">Pricing</h1>
-          <p className="text-muted-foreground mt-5 text-lg leading-relaxed">
+      <section className="relative overflow-hidden pb-14 pt-36 sm:pt-44">
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          <div className="animate-aurora bg-accent/20 absolute -top-40 left-1/3 h-[460px] w-[460px] rounded-full blur-[130px]" />
+          <div className="absolute inset-0 bg-[linear-gradient(rgb(255_255_255/0.03)_1px,transparent_1px),linear-gradient(90deg,rgb(255_255_255/0.03)_1px,transparent_1px)] bg-[size:72px_72px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_0%,#000_20%,transparent_100%)]" />
+        </div>
+        <div className="container relative text-center">
+          <p className="animate-rise text-accent-soft text-[13px] font-medium">Pricing</p>
+          <h1
+            className="text-gradient animate-rise mx-auto mt-3 max-w-[16ch] text-5xl leading-[1.02] sm:text-7xl"
+            style={{ ['--delay' as string]: '80ms' }}
+          >
+            Own it free. Or let us run it.
+          </h1>
+          <p
+            className="animate-rise text-muted-foreground mx-auto mt-6 max-w-[56ch] text-lg leading-relaxed"
+            style={{ ['--delay' as string]: '180ms' }}
+          >
             Self-host the whole product free, forever. Pay us only if you would rather not run it
             yourself, or if you need the enterprise identity and compliance pieces.
           </p>
@@ -121,103 +117,113 @@ export default function PricingPage() {
       </section>
 
       <section className="container pb-6">
-        <div className="grid gap-6 lg:grid-cols-3">
-          {tiers.map((tier) => (
+        <SpotlightGroup className="grid gap-4 lg:grid-cols-3">
+          {tiers.map((tier, i) => (
             <div
               key={tier.name}
-              className={`bg-surface flex flex-col rounded-lg border p-7 ${
-                tier.highlight ? 'border-border-strong shadow-sm' : 'border-border'
+              id={tier.name.toLowerCase()}
+              data-reveal
+              style={{ ['--delay' as string]: `${i * 100}ms` }}
+              className={`spotlight panel relative flex scroll-mt-28 flex-col overflow-hidden rounded-3xl p-7 ${
+                tier.highlight
+                  ? 'shadow-[0_0_0_1px_rgb(var(--accent)/0.35),0_40px_90px_-30px_rgb(var(--accent)/0.45)]'
+                  : ''
               }`}
             >
-              <div className="flex items-baseline justify-between">
+              {tier.highlight && (
+                <div
+                  aria-hidden
+                  className="bg-accent/25 pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full blur-3xl"
+                />
+              )}
+              <div className="relative flex items-center justify-between">
                 <h2 className="text-lg">{tier.name}</h2>
                 {tier.highlight && (
-                  <span className="border-border text-muted-foreground rounded-full border px-2.5 py-0.5 text-[11px] font-medium">
+                  <span className="bg-accent/15 text-accent-soft ring-accent/30 rounded-full px-2.5 py-0.5 text-[11px] font-medium ring-1 ring-inset">
                     Most popular
                   </span>
                 )}
               </div>
 
-              <div className="mt-5 flex items-baseline gap-2">
-                <span className="text-4xl font-semibold tracking-tight">{tier.price}</span>
+              <div className="relative mt-6 flex items-baseline gap-2">
+                <span className="font-display text-5xl font-semibold tracking-tight">
+                  {tier.price}
+                </span>
                 <span className="text-muted-foreground text-sm">{tier.cadence}</span>
               </div>
 
-              <p className="text-muted-foreground mt-4 min-h-[3.5rem] text-sm leading-relaxed">
+              <p className="text-muted-foreground relative mt-4 min-h-[3.5rem] text-sm leading-relaxed">
                 {tier.summary}
               </p>
 
-              {tier.cta.external ? (
-                <a
-                  href={tier.cta.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={`mt-6 inline-flex h-11 items-center justify-center rounded-lg px-5 text-sm font-medium transition-colors ${
-                    tier.highlight
-                      ? 'bg-primary text-primary-foreground hover:opacity-90'
-                      : 'border-border-strong hover:bg-surface-sunken border'
-                  }`}
-                >
-                  {tier.cta.label}
-                </a>
-              ) : (
-                <a
-                  href={tier.cta.href}
-                  className={`mt-6 inline-flex h-11 items-center justify-center rounded-lg px-5 text-sm font-medium transition-colors ${
-                    tier.highlight
-                      ? 'bg-primary text-primary-foreground hover:opacity-90'
-                      : 'border-border-strong hover:bg-surface-sunken border'
-                  }`}
-                >
-                  {tier.cta.label}
-                </a>
-              )}
+              <a
+                href={tier.cta.href}
+                {...(tier.cta.external ? { target: '_blank', rel: 'noreferrer' } : {})}
+                className={`relative mt-6 w-full ${tier.highlight ? 'btn-primary' : 'btn-ghost'}`}
+              >
+                {tier.cta.label}
+              </a>
 
-              <ul className="mt-7 space-y-2.5 text-sm">
+              <ul className="border-line relative mt-8 space-y-3 border-t pt-6 text-sm">
                 {tier.features.map((f) => (
                   <li key={f} className="flex gap-2.5 leading-relaxed">
-                    <Check />
+                    <Check
+                      className={`mt-[3px] h-4 w-4 shrink-0 ${tier.highlight ? 'text-accent-soft' : 'text-foreground/70'}`}
+                    />
                     <span className="text-muted-foreground">{f}</span>
                   </li>
                 ))}
               </ul>
             </div>
           ))}
-        </div>
+        </SpotlightGroup>
       </section>
 
-      <section className="container py-20">
-        <h2 className="text-2xl sm:text-3xl">Questions people actually ask</h2>
-        <dl className="mt-8 grid gap-x-12 gap-y-8 md:grid-cols-2">
-          {faqs.map((f) => (
-            <div key={f.q}>
-              <dt className="font-medium">{f.q}</dt>
-              <dd className="text-muted-foreground mt-2 text-sm leading-relaxed">{f.a}</dd>
-            </div>
-          ))}
-        </dl>
-
-        <p className="text-muted-foreground mt-12 max-w-prose text-sm leading-relaxed">
-          The exact terms are in the repository, not in a sales deck: the{' '}
-          <a
-            href={site.license}
-            target="_blank"
-            rel="noreferrer"
-            className="hover:text-foreground underline underline-offset-4"
-          >
-            AGPLv3 and its exceptions
-          </a>{' '}
-          at the root, and the{' '}
-          <a
-            href={`${site.github}/blob/main/packages/enterprise/LICENSE`}
-            target="_blank"
-            rel="noreferrer"
-            className="hover:text-foreground underline underline-offset-4"
-          >
-            Enterprise Edition license
-          </a>{' '}
-          alongside the code it covers.
-        </p>
+      <section className="container py-28">
+        <div className="grid gap-10 lg:grid-cols-[1fr_1.5fr]">
+          <div data-reveal className="max-w-md">
+            <p className="text-accent-soft text-[13px] font-medium">FAQ</p>
+            <h2 className="text-gradient mt-3 text-4xl leading-[1.05] sm:text-5xl">
+              Questions people actually ask.
+            </h2>
+            <p className="text-muted-foreground mt-5 text-sm leading-relaxed">
+              The exact terms are in the repository, not in a sales deck: the{' '}
+              <a
+                href={site.license}
+                target="_blank"
+                rel="noreferrer"
+                className="text-foreground underline decoration-white/20 underline-offset-4 hover:decoration-white/60"
+              >
+                AGPLv3 and its exceptions
+              </a>{' '}
+              at the root, and the{' '}
+              <a
+                href={`${site.github}/blob/main/packages/enterprise/LICENSE`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-foreground underline decoration-white/20 underline-offset-4 hover:decoration-white/60"
+              >
+                Enterprise Edition license
+              </a>{' '}
+              alongside the code it covers.
+            </p>
+          </div>
+          <div data-reveal className="border-line divide-y divide-white/[0.08] border-y">
+            {faqs.map((f, i) => (
+              <details key={f.q} open={i === 0}>
+                <summary className="flex cursor-pointer items-center justify-between gap-6 py-5 text-[15px] font-medium">
+                  {f.q}
+                  <span className="faq-icon border-line text-muted-foreground ease-out-expo grid h-7 w-7 shrink-0 place-items-center rounded-full border transition-transform duration-500">
+                    +
+                  </span>
+                </summary>
+                <p className="text-muted-foreground max-w-[62ch] pb-5 text-[14px] leading-relaxed">
+                  {f.a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </div>
       </section>
     </>
   );

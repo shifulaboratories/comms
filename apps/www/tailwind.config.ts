@@ -1,54 +1,63 @@
 import type { Config } from 'tailwindcss';
 
 /**
- * The marketing site borrows the app's design language — strict monochrome,
- * black as the accent, true-black dark mode — but keeps its own trimmed token
- * set rather than importing the app's. This site has to deploy on its own,
- * without the workspace, so it stays free of `@comms/*` dependencies.
+ * The marketing site is always dark: the product cards glow against it, and a
+ * single theme keeps the 3D stage's lighting consistent. It keeps its own
+ * token set rather than importing the app's, so it can deploy without the
+ * workspace.
  */
 const config: Config = {
-  // Follows the visitor's OS. There is no theme toggle to persist here.
-  darkMode: 'media',
   content: ['./src/**/*.{ts,tsx}'],
   theme: {
     container: {
       center: true,
-      padding: '1.5rem',
+      padding: { DEFAULT: '1.25rem', sm: '1.5rem' },
       screens: { '2xl': '1200px' },
     },
     extend: {
       fontFamily: {
-        sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+        sans: ['var(--font-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['var(--font-sans)', 'ui-sans-serif', 'sans-serif'],
+        serif: ['var(--font-serif)', 'ui-serif', 'Georgia', 'serif'],
         mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       colors: {
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
+        background: 'rgb(var(--bg) / <alpha-value>)',
+        foreground: 'rgb(var(--fg) / <alpha-value>)',
         surface: {
-          DEFAULT: 'hsl(var(--surface))',
-          sunken: 'hsl(var(--surface-sunken))',
+          DEFAULT: 'rgb(var(--surface) / <alpha-value>)',
+          raised: 'rgb(var(--surface-raised) / <alpha-value>)',
+          sunken: 'rgb(var(--surface-sunken) / <alpha-value>)',
         },
         muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
+          DEFAULT: 'rgb(var(--muted) / <alpha-value>)',
+          foreground: 'rgb(var(--muted-fg) / <alpha-value>)',
         },
-        primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
+        subtle: 'rgb(var(--subtle) / <alpha-value>)',
+        accent: {
+          DEFAULT: 'rgb(var(--accent) / <alpha-value>)',
+          soft: 'rgb(var(--accent-soft) / <alpha-value>)',
         },
-        border: {
-          DEFAULT: 'hsl(var(--border))',
-          strong: 'hsl(var(--border-strong))',
+        violet: 'rgb(var(--violet) / <alpha-value>)',
+        success: 'rgb(var(--success) / <alpha-value>)',
+        warning: 'rgb(var(--warning) / <alpha-value>)',
+        danger: 'rgb(var(--danger) / <alpha-value>)',
+        line: {
+          DEFAULT: 'rgb(255 255 255 / 0.08)',
+          strong: 'rgb(255 255 255 / 0.14)',
         },
-        success: 'hsl(var(--success))',
       },
       borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        xl: '0.875rem',
+        '2xl': '1.125rem',
+        '3xl': '1.5rem',
       },
       maxWidth: {
-        prose: '68ch',
+        prose: '64ch',
+      },
+      transitionTimingFunction: {
+        'out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',
+        spring: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
       },
     },
   },
