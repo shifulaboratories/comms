@@ -193,9 +193,7 @@ export function PersonProfile({ data }: { data: PersonProfileData }) {
       <div className="flex items-start gap-4">
         <Avatar className="ring-border h-16 w-16 shrink-0 ring-1">
           {c.avatarUrl && <AvatarImage src={c.avatarUrl} alt={displayName} />}
-          <AvatarFallback className="bg-secondary text-muted-foreground text-lg font-semibold">
-            {initials(displayName)}
-          </AvatarFallback>
+          <AvatarFallback className="text-lg font-semibold">{initials(displayName)}</AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-xl font-semibold tracking-[-0.01em]">{displayName}</h1>

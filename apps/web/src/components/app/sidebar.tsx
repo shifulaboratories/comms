@@ -52,17 +52,17 @@ function NavRow({
       href={href}
       className={cn(
         'type-item group relative flex items-center gap-2.5 rounded-lg px-2.5 py-[7px] transition-colors duration-150',
-        active ? 'text-brand' : 'text-muted-foreground hover:text-foreground font-normal',
+        active ? 'text-foreground' : 'text-muted-foreground hover:text-foreground font-normal',
       )}
     >
       {active ? (
         <motion.span
           layoutId="nav-active"
-          className="bg-brand-muted absolute inset-0 -z-10 rounded-lg"
+          className="bg-accent shadow-xs ring-border-strong/40 absolute inset-0 -z-10 rounded-lg ring-1 ring-inset"
           transition={{ type: 'spring', stiffness: 500, damping: 38 }}
         />
       ) : (
-        <span className="group-hover:bg-accent absolute inset-0 -z-10 rounded-lg bg-transparent transition-colors duration-150" />
+        <span className="group-hover:bg-accent/60 absolute inset-0 -z-10 rounded-lg bg-transparent transition-colors duration-150" />
       )}
 
       {Icon && <Icon className="h-[15px] w-[15px] shrink-0" />}
@@ -77,8 +77,8 @@ function NavRow({
       {count ? (
         <span
           className={cn(
-            'tabular type-caption shrink-0 tracking-tight transition-colors',
-            active ? 'text-brand' : 'text-muted-foreground/70',
+            'tabular shrink-0 font-mono text-[11px] tracking-tight transition-colors',
+            active ? 'text-foreground/80' : 'text-muted-foreground/70',
           )}
         >
           {count > 99 ? '99+' : count}
@@ -97,7 +97,7 @@ function SectionLabel({
 }) {
   return (
     <div className="flex items-center justify-between px-2.5 pb-1.5 pt-5 first:pt-1">
-      <span className="type-micro text-muted-foreground/60">{children}</span>
+      <span className="type-micro text-muted-foreground/70">{children}</span>
       {action}
     </div>
   );
@@ -163,7 +163,7 @@ export function Sidebar({
       // No width transition on purpose: the stored width is only known after
       // mount, so an animated one would visibly slide the whole shell open on
       // every page load. Dragging wants instant anyway.
-      className="bg-surface-sunken relative flex h-full w-[248px] shrink-0 flex-col border-r md:w-[var(--sidebar-w)]"
+      className="border-border-strong bg-background relative flex h-full w-[248px] shrink-0 flex-col border-r border-dashed md:w-[var(--sidebar-w)]"
     >
       <SidebarResizer
         width={width}

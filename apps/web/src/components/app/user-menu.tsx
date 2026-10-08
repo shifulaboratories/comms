@@ -33,7 +33,7 @@ export function UserMenu({
       <DropdownMenuTrigger className="hover:bg-accent data-[state=open]:bg-accent group flex w-full items-center gap-2.5 rounded-lg p-2 text-left transition-colors duration-150">
         <Avatar className="ring-border h-7 w-7 ring-1">
           {user.image && <AvatarImage src={user.image} alt={user.name ?? ''} />}
-          <AvatarFallback className="bg-brand-muted text-brand text-[11px] font-semibold">
+          <AvatarFallback className="text-[11px] font-semibold">
             {initials(user.name)}
           </AvatarFallback>
         </Avatar>

@@ -659,7 +659,7 @@ export function ConversationListPane({
 
         {/* Sliding segmented control — quick presets over the filter bar. */}
         <div className="flex items-center gap-1">
-          <div className="bg-secondary/60 flex flex-1 items-center gap-0.5 rounded-xl p-[3px]">
+          <div className="seg flex-1">
             {tabs.map((t) => {
               const isActive =
                 (t.key === 'active' && !assignee && statusFilter === 'active') ||
@@ -672,14 +672,14 @@ export function ConversationListPane({
                   key={t.key}
                   href={t.href}
                   className={cn(
-                    'type-caption relative flex-1 rounded-lg px-2 py-1.5 text-center font-medium transition-colors duration-150',
+                    'seg-item flex-1 px-2',
                     isActive ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
                   )}
                 >
                   {isActive && (
                     <motion.span
                       layoutId="list-tab"
-                      className="bg-surface shadow-xs absolute inset-0 rounded-lg"
+                      className="seg-pill"
                       transition={{ type: 'spring', stiffness: 500, damping: 38 }}
                     />
                   )}
@@ -923,10 +923,10 @@ export function ConversationListPane({
                         className={cn(
                           'group relative flex gap-3 rounded-xl px-3 py-3 transition-colors duration-150',
                           active
-                            ? 'bg-brand-muted'
+                            ? 'bg-accent shadow-xs ring-border-strong/60 ring-1 ring-inset'
                             : isSelected
-                              ? 'bg-accent'
-                              : 'hover:bg-accent/60',
+                              ? 'bg-brand-muted/70'
+                              : 'hover:bg-accent/50',
                         )}
                       >
                         {/* Priority spine — urgent and high only. A marker that
@@ -954,7 +954,7 @@ export function ConversationListPane({
                             {c.contact?.avatarUrl && (
                               <AvatarImage src={c.contact.avatarUrl} alt={name} />
                             )}
-                            <AvatarFallback className="type-caption bg-secondary text-muted-foreground font-semibold">
+                            <AvatarFallback className="type-caption font-semibold">
                               {initials(nameForInitials(nameInput))}
                             </AvatarFallback>
                           </Avatar>

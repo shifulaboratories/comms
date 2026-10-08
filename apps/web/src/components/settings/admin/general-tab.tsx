@@ -169,7 +169,7 @@ export function GeneralTab({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-          <div className="text-muted-foreground/70 flex items-center gap-2 pb-1 text-[10.5px] font-semibold uppercase tracking-wide">
+          <div className="type-micro text-muted-foreground/70 flex items-center gap-2 pb-1">
             <span className="min-w-0 flex-1">Person</span>
             <span className="w-24 shrink-0 text-center">Super</span>
             <span className="w-24 shrink-0 text-center">Admin panel</span>
@@ -185,7 +185,7 @@ export function GeneralTab({
               <div key={a.id} className="flex items-center gap-2">
                 <Avatar className="h-7 w-7 shrink-0">
                   {a.image && <AvatarImage src={a.image} alt="" />}
-                  <AvatarFallback className="bg-secondary text-[10px] font-semibold">
+                  <AvatarFallback className="text-[10px] font-semibold">
                     {initials(a.name ?? a.email)}
                   </AvatarFallback>
                 </Avatar>
@@ -256,7 +256,7 @@ export function GeneralTab({
               >
                 <Avatar className="h-7 w-7 shrink-0">
                   {u.image && <AvatarImage src={u.image} alt="" />}
-                  <AvatarFallback className="bg-secondary text-[10px] font-semibold">
+                  <AvatarFallback className="text-[10px] font-semibold">
                     {initials(u.name ?? u.email)}
                   </AvatarFallback>
                 </Avatar>

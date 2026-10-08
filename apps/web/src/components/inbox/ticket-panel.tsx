@@ -52,8 +52,8 @@ function Section({
   icon?: React.ElementType;
 }) {
   return (
-    <section className="border-t px-4 py-3.5 first:border-t-0">
-      <p className="text-muted-foreground/70 mb-2.5 flex items-center gap-1.5 text-[10.5px] font-semibold uppercase tracking-[0.07em]">
+    <section className="border-border-strong border-t border-dashed px-4 py-3.5 first:border-t-0">
+      <p className="type-micro text-muted-foreground/70 mb-2.5 flex items-center gap-1.5">
         {Icon && <Icon className="h-3 w-3" />}
         {label}
       </p>
@@ -78,7 +78,7 @@ function CollapsibleSection({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <section className="border-t px-4 py-3.5">
+    <section className="border-border-strong border-t border-dashed px-4 py-3.5">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
@@ -212,7 +212,7 @@ export function TicketPanel({
       ) : (
         <div className="flex flex-col items-center gap-2.5 px-4 py-5 text-center">
           <Avatar className="ring-border h-14 w-14 ring-1">
-            <AvatarFallback className="bg-brand-muted text-brand text-base font-semibold">
+            <AvatarFallback className="text-base font-semibold">
               {initials(conversation.contactName)}
             </AvatarFallback>
           </Avatar>
@@ -237,7 +237,7 @@ export function TicketPanel({
                 <>
                   <Avatar className="ring-border h-7 w-7 ring-1">
                     {m.avatarUrl && <AvatarImage src={m.avatarUrl} alt="" />}
-                    <AvatarFallback className="bg-secondary text-muted-foreground text-[10px] font-semibold">
+                    <AvatarFallback className="text-[10px] font-semibold">
                       {initials(display)}
                     </AvatarFallback>
                   </Avatar>

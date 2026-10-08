@@ -108,7 +108,7 @@ export function OfferTimes({
           ) : (
             byDay.map(([day, daySlots]) => (
               <div key={day} className="mb-2">
-                <p className="text-muted-foreground/70 px-1.5 pb-1 text-[10.5px] font-semibold uppercase tracking-wide">
+                <p className="type-micro text-muted-foreground/70 px-1.5 pb-1">
                   {daySlots[0]!.start.toLocaleDateString(undefined, {
                     weekday: 'long',
                     month: 'short',

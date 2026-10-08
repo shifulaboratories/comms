@@ -46,7 +46,7 @@ export function ProfileForm({
       <div className="flex items-center gap-4">
         <Avatar className="ring-border h-14 w-14 ring-1">
           {image && <AvatarImage src={image} alt="" />}
-          <AvatarFallback className="bg-brand-muted text-brand text-sm font-semibold">
+          <AvatarFallback className="text-sm font-semibold">
             {initials(name || email)}
           </AvatarFallback>
         </Avatar>

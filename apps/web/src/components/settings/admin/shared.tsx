@@ -63,7 +63,7 @@ export function ComingSoon({
           <p className="flex items-center justify-center gap-2 text-sm font-semibold">
             {title}
             {badge && (
-              <span className="bg-brand-muted text-brand rounded px-1.5 py-px text-[10px] font-semibold uppercase tracking-wide">
+              <span className="bg-brand-muted type-micro text-brand rounded px-1.5 py-px">
                 {badge}
               </span>
             )}

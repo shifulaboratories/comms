@@ -196,8 +196,8 @@ export function ConversationHeader({
   }
 
   return (
-    <header className="bg-surface/80 flex h-[52px] shrink-0 items-center justify-between gap-2 border-b px-2.5 backdrop-blur-xl md:gap-4 md:px-4">
-      <div className="flex min-w-0 items-center gap-2 md:gap-2.5">
+    <header className="border-border-strong bg-background/80 flex h-[52px] shrink-0 items-center justify-between gap-2 border-b border-dashed px-2.5 backdrop-blur-xl md:gap-3 md:px-4">
+      <div className="flex min-w-[5rem] flex-1 items-center gap-2 md:gap-2.5">
         <Link
           href="/inbox"
           className="text-muted-foreground hover:bg-accent hover:text-foreground -ml-0.5 rounded-lg p-1.5 transition-colors md:hidden"
@@ -206,7 +206,7 @@ export function ConversationHeader({
           <ChevronLeft className="h-5 w-5" />
         </Link>
         <h1 className="truncate text-[14px] font-semibold tracking-[-0.01em]">{name}</h1>
-        <span className="tabular bg-secondary text-muted-foreground hidden shrink-0 rounded-md px-1.5 py-px font-mono text-[11px] sm:inline">
+        <span className="tabular text-muted-foreground hidden shrink-0 rounded-md border px-1.5 py-px font-mono text-[10.5px] xl:inline">
           #{number}
         </span>
         <span className="text-muted-foreground flex shrink-0 items-center gap-1.5 text-[11.5px] capitalize">
@@ -224,7 +224,7 @@ export function ConversationHeader({
         )}
       </div>
 
-      <div className="flex shrink-0 items-center gap-1 md:gap-2">
+      <div className="flex shrink-0 items-center gap-1 md:gap-1.5">
         <div className="hidden sm:block">
           <PresenceBar conversationId={conversationId} />
         </div>
@@ -265,8 +265,8 @@ export function ConversationHeader({
             <DropdownMenuTrigger asChild>
               <Button size="sm" variant="ghost" className="gap-1.5">
                 <Clock className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Snooze</span>
-                <kbd className="bg-secondary text-muted-foreground ml-0.5 hidden rounded border px-1 text-[10px] md:inline">
+                <span className="hidden xl:inline">Snooze</span>
+                <kbd className="bg-secondary text-muted-foreground ml-0.5 hidden rounded border px-1 text-[10px] xl:inline">
                   s
                 </kbd>
               </Button>
@@ -320,7 +320,7 @@ export function ConversationHeader({
           <Button size="sm" onClick={() => applyStatus('closed')}>
             <Check className="h-3.5 w-3.5" />
             Close
-            <kbd className="border-primary-foreground/25 ml-0.5 hidden rounded border px-1 text-[10px] opacity-70 md:inline">
+            <kbd className="border-primary-foreground/25 ml-0.5 hidden rounded border px-1 text-[10px] opacity-70 xl:inline">
               e
             </kbd>
           </Button>

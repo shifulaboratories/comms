@@ -368,9 +368,9 @@ export function MessageThread({
 
             const dayDivider = showDay ? (
               <div key={`day-${m.id}`} className="flex items-center gap-3 py-4">
-                <div className="divider-fade h-px flex-1" />
+                <div className="border-border-strong h-px flex-1 border-t border-dashed" />
                 <span className="type-caption text-muted-foreground font-medium">{day}</span>
-                <div className="divider-fade h-px flex-1" />
+                <div className="border-border-strong h-px flex-1 border-t border-dashed" />
               </div>
             ) : null;
 

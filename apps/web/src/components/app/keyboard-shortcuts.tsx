@@ -118,9 +118,7 @@ export function KeyboardShortcuts() {
         <div className="space-y-4 pt-1">
           {(Object.keys(groups) as KeyActionGroup[]).map((group) => (
             <div key={group}>
-              <p className="text-muted-foreground/70 px-2 pb-1 text-[10px] font-semibold uppercase tracking-wider">
-                {group}
-              </p>
+              <p className="type-micro text-muted-foreground/70 px-2 pb-1">{group}</p>
               {groups[group]!.map((action) => {
                 const bindings = keymap[action.id] ?? [];
                 return (
@@ -144,9 +142,7 @@ export function KeyboardShortcuts() {
 
           {/* Context-specific keys the global map doesn't own. */}
           <div>
-            <p className="text-muted-foreground/70 px-2 pb-1 text-[10px] font-semibold uppercase tracking-wider">
-              In the composer
-            </p>
+            <p className="type-micro text-muted-foreground/70 px-2 pb-1">In the composer</p>
             {[
               { label: 'Macros', keys: [['/']] },
               { label: 'Accept AI draft', keys: [['⇥']] },

@@ -237,7 +237,7 @@ export function NewFolderDialog({
 
           <div className="relative">
             <div className="bg-border h-px" />
-            <span className="bg-surface text-muted-foreground/60 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 px-2 text-[10.5px] uppercase tracking-wide">
+            <span className="bg-surface type-micro text-muted-foreground/60 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 px-2">
               or build one
             </span>
           </div>

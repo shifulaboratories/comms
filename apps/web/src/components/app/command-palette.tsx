@@ -154,7 +154,7 @@ export function CommandPalette({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="top-[18%] max-w-lg translate-y-0 gap-0 overflow-hidden p-0">
         <DialogTitle className="sr-only">Command palette</DialogTitle>
-        <div className="flex items-center gap-2.5 border-b px-3.5">
+        <div className="border-border-strong flex items-center gap-2.5 border-b border-dashed px-3.5">
           <Search className="text-muted-foreground h-[15px] w-[15px] shrink-0" />
           <input
             autoFocus
@@ -162,7 +162,7 @@ export function CommandPalette({
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={onKeyDown}
             placeholder="Search, or try tag:billing  status:open  is:unread"
-            className="placeholder:text-muted-foreground/70 h-[52px] w-full bg-transparent text-[13.5px] outline-none"
+            className="placeholder:text-muted-foreground/70 h-[52px] w-full bg-transparent text-[13.5px] outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
           />
           <kbd className="bg-secondary text-muted-foreground shrink-0 rounded border px-1.5 py-0.5 text-[10px]">
             ESC
@@ -182,13 +182,13 @@ export function CommandPalette({
                   onMouseEnter={() => setActive(i)}
                   className={cn(
                     'relative flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-[13px] transition-colors duration-100',
-                    selected ? 'bg-brand-muted text-brand' : 'text-foreground hover:bg-accent/70',
+                    selected ? 'bg-accent text-foreground' : 'text-foreground hover:bg-accent/60',
                   )}
                 >
                   <Icon
                     className={cn(
                       'h-4 w-4 shrink-0',
-                      selected ? 'text-brand' : 'text-muted-foreground',
+                      selected ? 'text-foreground' : 'text-muted-foreground',
                     )}
                   />
                   <span className="shrink-0 font-medium">{it.label}</span>
@@ -196,7 +196,7 @@ export function CommandPalette({
                     <span
                       className={cn(
                         'ml-auto truncate text-[11.5px]',
-                        selected ? 'text-brand/70' : 'text-muted-foreground',
+                        selected ? 'text-muted-foreground' : 'text-muted-foreground/70',
                       )}
                     >
                       {it.sub}

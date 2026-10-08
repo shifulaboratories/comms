@@ -170,7 +170,7 @@ export function EnterpriseTab({ license }: { license: LicenseState }) {
               <span className="min-w-0">
                 <span className="flex items-center gap-2 text-[12.5px] font-medium">
                   {f.title}
-                  <span className="bg-secondary text-muted-foreground rounded px-1.5 py-px text-[10px] font-semibold uppercase tracking-wide">
+                  <span className="bg-secondary type-micro text-muted-foreground rounded px-1.5 py-px">
                     Coming soon
                   </span>
                 </span>

@@ -107,21 +107,21 @@ export function DetailsPane({
       {collapsed && rail}
       <aside
         className={cn(
-          'bg-surface flex h-full w-[85vw] max-w-[320px] shrink-0 flex-col border-l lg:w-[288px]',
+          'border-border-strong bg-background flex h-full w-[85vw] max-w-[320px] shrink-0 flex-col border-l border-dashed lg:w-[288px]',
           collapsed && 'lg:hidden',
         )}
       >
-        <div className="flex shrink-0 items-center gap-0.5 border-b px-2 py-1.5">
-          <div className="bg-secondary/60 flex flex-1 items-center gap-0.5 rounded-lg p-0.5">
+        <div className="border-border-strong flex shrink-0 items-center gap-1 border-b border-dashed px-2.5 py-2">
+          <div className="seg flex-1">
             {TABS.map((t) => (
               <button
                 key={t.key}
                 type="button"
                 onClick={() => pickTab(t.key)}
                 className={cn(
-                  'flex flex-1 items-center justify-center gap-1 rounded-md px-1.5 py-1 text-[11px] font-medium transition-colors',
+                  'seg-item flex flex-1 items-center justify-center gap-1 px-1.5 text-[11.5px]',
                   tab === t.key
-                    ? 'bg-surface text-foreground shadow-xs'
+                    ? 'bg-surface text-foreground shadow-xs ring-border dark:bg-accent dark:ring-border-strong/80 ring-1 ring-inset'
                     : 'text-muted-foreground hover:text-foreground',
                 )}
               >

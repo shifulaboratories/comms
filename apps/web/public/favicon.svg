@@ -1,7 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
-  <rect width="32" height="32" rx="7" fill="#0a0a0a" />
-  <path
-    d="M8 11.5C8 9.57 9.57 8 11.5 8h9C22.43 8 24 9.57 24 11.5v6c0 1.93-1.57 3.5-3.5 3.5H13l-5 4V11.5Z"
-    fill="#ffffff"
-  />
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="a" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse"><stop stop-color="#64AAFF"/><stop offset="1" stop-color="#7C6CFF"/></linearGradient></defs><rect width="32" height="32" rx="9" fill="url(#a)"/><path d="M9 11.5c0-1.9 1.6-3.5 3.5-3.5h7c1.9 0 3.5 1.6 3.5 3.5v4c0 1.9-1.6 3.5-3.5 3.5h-4.2L11.6 22v-3.2A3.5 3.5 0 0 1 9 15.5v-4Z" fill="#fff"/><circle cx="13" cy="13.6" r="1.1" fill="#3D6BFF"/><circle cx="16" cy="13.6" r="1.1" fill="#3D6BFF"/><circle cx="19" cy="13.6" r="1.1" fill="#3D6BFF"/></svg>

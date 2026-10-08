@@ -100,9 +100,7 @@ export function SettingsNav({ permissions }: { permissions: string[] }) {
       <div className="hidden md:block">
         {groups.map((group) => (
           <div key={group.title} className="mb-4 last:mb-0">
-            <p className="text-muted-foreground/70 px-2.5 pb-1 text-[10px] font-semibold uppercase tracking-wider">
-              {group.title}
-            </p>
+            <p className="type-micro text-muted-foreground/70 px-2.5 pb-1">{group.title}</p>
             <div className="space-y-0.5">
               {group.items.map((item) => (
                 <Link
@@ -112,7 +110,7 @@ export function SettingsNav({ permissions }: { permissions: string[] }) {
                   className={cn(
                     'flex items-center gap-2.5 rounded-lg px-2.5 py-[7px] text-[13px] transition-colors',
                     isActive(item.href)
-                      ? 'bg-brand-muted text-brand font-medium'
+                      ? 'bg-accent text-foreground shadow-xs ring-border-strong/60 font-medium ring-1 ring-inset'
                       : 'text-muted-foreground hover:bg-accent hover:text-foreground',
                   )}
                 >
@@ -138,7 +136,7 @@ export function SettingsNav({ permissions }: { permissions: string[] }) {
               className={cn(
                 'flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-[12.5px] transition-colors',
                 isActive(item.href)
-                  ? 'bg-brand-muted text-brand font-medium'
+                  ? 'bg-accent text-foreground shadow-xs ring-border-strong/60 font-medium ring-1 ring-inset'
                   : 'text-muted-foreground hover:bg-accent hover:text-foreground',
               )}
             >

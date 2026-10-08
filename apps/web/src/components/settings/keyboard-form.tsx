@@ -205,9 +205,7 @@ export function KeyboardForm({ preference }: { preference: KeymapPreference | nu
         <div className="space-y-5">
           {(Object.keys(groups) as KeyActionGroup[]).map((group) => (
             <div key={group}>
-              <p className="text-muted-foreground/70 pb-1.5 text-[10px] font-semibold uppercase tracking-wider">
-                {group}
-              </p>
+              <p className="type-micro text-muted-foreground/70 pb-1.5">{group}</p>
               <div className="divide-y rounded-xl border">
                 {groups[group]!.map((action) => {
                   const bindings = keymap[action.id] ?? [];

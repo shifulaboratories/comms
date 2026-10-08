@@ -148,7 +148,7 @@ export function NewConversation({ inboxes = [] }: { inboxes?: ComposeInbox[] }) 
                     )}
                   >
                     <Avatar className="h-7 w-7">
-                      <AvatarFallback className="bg-secondary text-[10px] font-semibold">
+                      <AvatarFallback className="text-[10px] font-semibold">
                         {r.contactId ? initials(r.name) : <User className="h-3 w-3" />}
                       </AvatarFallback>
                     </Avatar>

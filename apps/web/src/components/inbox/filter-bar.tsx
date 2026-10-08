@@ -209,9 +209,7 @@ export function FilterBar({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-60">
-          <DropdownMenuLabel className="text-muted-foreground text-[10.5px] uppercase tracking-wide">
-            Status
-          </DropdownMenuLabel>
+          <DropdownMenuLabel className="type-micro text-muted-foreground">Status</DropdownMenuLabel>
           {STATUSES.map((s) => (
             <DropdownMenuItem
               key={s.key}
@@ -223,7 +221,7 @@ export function FilterBar({
           ))}
 
           <DropdownMenuSeparator />
-          <DropdownMenuLabel className="text-muted-foreground text-[10.5px] uppercase tracking-wide">
+          <DropdownMenuLabel className="type-micro text-muted-foreground">
             Priority
           </DropdownMenuLabel>
           {PRIORITIES.map((p) => (
@@ -243,7 +241,7 @@ export function FilterBar({
           {allTags.length > 0 && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuLabel className="text-muted-foreground text-[10.5px] uppercase tracking-wide">
+              <DropdownMenuLabel className="type-micro text-muted-foreground">
                 Tags
               </DropdownMenuLabel>
               <div className="max-h-40 overflow-y-auto">
@@ -285,7 +283,7 @@ export function FilterBar({
           </DropdownMenuItem>
 
           <DropdownMenuSeparator />
-          <DropdownMenuLabel className="text-muted-foreground text-[10.5px] uppercase tracking-wide">
+          <DropdownMenuLabel className="type-micro text-muted-foreground">
             Who it&apos;s with
           </DropdownMenuLabel>
           {KINDS.map((k) => (
@@ -301,7 +299,7 @@ export function FilterBar({
           {inboxes.length > 1 && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuLabel className="text-muted-foreground text-[10.5px] uppercase tracking-wide">
+              <DropdownMenuLabel className="type-micro text-muted-foreground">
                 Channel
               </DropdownMenuLabel>
               {inboxes.map((i) => (

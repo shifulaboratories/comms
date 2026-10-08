@@ -202,7 +202,7 @@ export function HealthTab({ health, version }: { health: SystemHealth; version: 
           <CardTitle className="text-base">Queues</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-muted-foreground/70 grid grid-cols-5 gap-1 text-[11px] font-semibold uppercase tracking-wide">
+          <div className="type-micro text-muted-foreground/70 grid grid-cols-5 gap-1">
             <span>Queue</span>
             <span className="text-right">Waiting</span>
             <span className="text-right">Active</span>

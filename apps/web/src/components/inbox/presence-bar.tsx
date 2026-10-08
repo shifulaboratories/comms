@@ -42,9 +42,7 @@ export function PresenceBar({ conversationId }: { conversationId: string }) {
       <div className="flex -space-x-1.5">
         {list.slice(0, 3).map((p) => (
           <Avatar key={p.userId} className="ring-surface h-5 w-5 ring-2">
-            <AvatarFallback className="bg-secondary text-[9px] font-semibold">
-              {initials(p.name)}
-            </AvatarFallback>
+            <AvatarFallback className="text-[9px] font-semibold">{initials(p.name)}</AvatarFallback>
           </Avatar>
         ))}
       </div>

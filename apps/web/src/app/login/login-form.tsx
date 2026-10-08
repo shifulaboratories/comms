@@ -108,7 +108,7 @@ export function LoginForm({
           <>
             <div className="relative py-1">
               <div className="divider-fade h-px" />
-              <span className="bg-card text-muted-foreground absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 px-2.5 text-[11px] uppercase tracking-wider">
+              <span className="bg-card type-micro text-muted-foreground absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 px-2.5">
                 or
               </span>
             </div>

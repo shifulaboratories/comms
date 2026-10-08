@@ -456,11 +456,11 @@ export function Composer({
           setActiveIndex={picker.setActiveIndex}
         />
       )}
-      {/* One bordered surface containing toolbar + field + send, so the composer
-          reads as a single object rather than three stacked strips. */}
+      {/* A prompt bar: one bordered surface with the field on top and a single
+          toolbar row beneath it — mode, tools, and an always-present send. */}
       <div
         className={cn(
-          'bg-surface ease-smooth rounded-xl border shadow-sm transition-all duration-200',
+          'bg-surface ease-smooth dark:bg-secondary rounded-2xl border shadow-sm transition-all duration-200',
           focused && !isNote && 'border-brand/50 ring-brand/12 ring-[3px]',
           isNote && 'border-warning/45 bg-warning-muted/40',
           focused && isNote && 'ring-warning/15 ring-[3px]',
@@ -494,21 +494,57 @@ export function Composer({
           )}
         </AnimatePresence>
 
-        <div className="flex items-center justify-between gap-2 px-2 pt-2">
+        <div className="flex items-end gap-2 px-3 pb-1 pt-2.5">
+          <div className="relative min-w-0 flex-1">
+            {/* Mirrors the textarea exactly and sits behind it: the typed text
+                is rendered invisibly so the completion lands in the right
+                place regardless of wrapping. Any typography change here must
+                be made on both or the ghost drifts out of alignment. */}
+            {completion && (
+              <div
+                ref={ghostRef}
+                aria-hidden
+                className="pointer-events-none absolute left-0 right-0 top-0 max-h-[180px] overflow-hidden whitespace-pre-wrap break-words px-1.5 py-1.5 text-[13.5px] leading-[inherit] md:text-[13.5px]"
+              >
+                <span className="invisible">{body}</span>
+                <span className="text-muted-foreground/50">{completion}</span>
+              </div>
+            )}
+            <Textarea
+              ref={ref}
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              onKeyDown={onKeyDown}
+              onScroll={syncGhostScroll}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              placeholder={
+                isNote
+                  ? 'Write an internal note — the customer never sees this…'
+                  : aiDraft
+                    ? 'Type a message…  ⇥ to accept the suggested reply'
+                    : 'Type a message…  /  for macros'
+              }
+              className="relative max-h-[180px] min-h-[44px] w-full resize-none border-0 bg-transparent px-1.5 py-1.5 text-[13.5px] shadow-none focus-visible:ring-0 md:text-[13.5px]"
+              rows={1}
+            />
+          </div>
+        </div>
+        <div className="flex items-center gap-2 px-2 pb-2 pt-1">
           {/* Segmented reply/note switch — clearer than a bare toggle. */}
-          <div className="bg-secondary/70 flex items-center gap-0.5 rounded-lg p-0.5">
+          <div className="seg">
             <button
               type="button"
               onClick={() => setIsNote(false)}
               className={cn(
-                'relative rounded-[0.4rem] px-2.5 py-1 text-[11.5px] font-medium transition-colors duration-150',
+                'seg-item',
                 !isNote ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
               )}
             >
               {!isNote && (
                 <motion.span
                   layoutId="composer-mode"
-                  className="bg-surface shadow-xs absolute inset-0 rounded-[0.4rem]"
+                  className="seg-pill"
                   transition={{ type: 'spring', stiffness: 500, damping: 38 }}
                 />
               )}
@@ -518,14 +554,14 @@ export function Composer({
               type="button"
               onClick={() => setIsNote(true)}
               className={cn(
-                'relative flex items-center gap-1 rounded-[0.4rem] px-2.5 py-1 text-[11.5px] font-medium transition-colors duration-150',
+                'seg-item flex items-center gap-1',
                 isNote ? 'text-warning' : 'text-muted-foreground hover:text-foreground',
               )}
             >
               {isNote && (
                 <motion.span
                   layoutId="composer-mode"
-                  className="bg-surface shadow-xs absolute inset-0 rounded-[0.4rem]"
+                  className="seg-pill"
                   transition={{ type: 'spring', stiffness: 500, damping: 38 }}
                 />
               )}
@@ -536,7 +572,7 @@ export function Composer({
             </button>
           </div>
 
-          <div className="flex items-center gap-0.5">
+          <div className="ml-auto flex items-center gap-0.5">
             {/* Share draft: hand what you've written to the team for review. */}
             {!isNote && (body.trim() || shared) && (
               <Button
@@ -608,106 +644,67 @@ export function Composer({
               </Popover>
             )}
           </div>
-        </div>
-
-        <div className="flex items-end gap-2 p-2">
-          <div className="relative min-w-0 flex-1">
-            {/* Mirrors the textarea exactly and sits behind it: the typed text
-                is rendered invisibly so the completion lands in the right
-                place regardless of wrapping. Any typography change here must
-                be made on both or the ghost drifts out of alignment. */}
-            {completion && (
-              <div
-                ref={ghostRef}
-                aria-hidden
-                className="pointer-events-none absolute left-0 right-0 top-0 max-h-[180px] overflow-hidden whitespace-pre-wrap break-words px-1.5 py-1.5 text-[13.5px] leading-[inherit] md:text-[13.5px]"
-              >
-                <span className="invisible">{body}</span>
-                <span className="text-muted-foreground/50">{completion}</span>
-              </div>
+          <div className="flex items-center gap-1">
+            {!isNote && canSend && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    size="icon-sm"
+                    variant="ghost"
+                    className="rounded-full"
+                    aria-label="Send later"
+                    title="Send later"
+                  >
+                    <Clock className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel className="text-muted-foreground text-xs font-normal">
+                    Send later…
+                  </DropdownMenuLabel>
+                  {SEND_LATER_PRESETS.map((p) => {
+                    const when = p.until();
+                    return (
+                      <DropdownMenuItem key={p.key} onClick={() => submit(when)}>
+                        <span className="flex-1">{p.label}</span>
+                        <span className="tabular text-muted-foreground text-[11px]">
+                          {when.toLocaleDateString(undefined, { weekday: 'short' })}{' '}
+                          {when.toLocaleTimeString(undefined, {
+                            hour: 'numeric',
+                            minute: '2-digit',
+                          })}
+                        </span>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuLabel className="text-muted-foreground text-xs font-normal">
+                    Or a specific time
+                  </DropdownMenuLabel>
+                  <div onKeyDown={(e) => e.stopPropagation()}>
+                    <CustomTimePicker onPick={(at) => submit(at)} autoFocus={false} />
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
-            <Textarea
-              ref={ref}
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              onKeyDown={onKeyDown}
-              onScroll={syncGhostScroll}
-              onFocus={() => setFocused(true)}
-              onBlur={() => setFocused(false)}
-              placeholder={
-                isNote
-                  ? 'Write an internal note — the customer never sees this…'
-                  : aiDraft
-                    ? 'Type a message…  ⇥ to accept the suggested reply'
-                    : 'Type a message…  /  for macros'
-              }
-              className="relative max-h-[180px] min-h-[38px] w-full resize-none border-0 bg-transparent px-1.5 py-1.5 text-[13.5px] shadow-none focus-visible:ring-0 md:text-[13.5px]"
-              rows={1}
-            />
+            <Button
+              onClick={() => submit()}
+              loading={pending}
+              disabled={!canSend && !pending}
+              size="icon-sm"
+              variant={isNote ? 'default' : 'brand'}
+              className={cn(
+                'h-8 w-8 rounded-full transition-all duration-200',
+                !canSend &&
+                  !pending &&
+                  'bg-muted-foreground/25 text-background opacity-100 shadow-none',
+                isNote && canSend && 'bg-warning text-warning-foreground hover:bg-warning/90',
+              )}
+              aria-label="Send"
+            >
+              <Send className="h-4 w-4" />
+            </Button>
           </div>
-          <AnimatePresence mode="popLayout">
-            {canSend || pending ? (
-              <motion.div
-                key="send"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                className="flex items-center gap-1"
-              >
-                {!isNote && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        size="icon-sm"
-                        variant="ghost"
-                        aria-label="Send later"
-                        title="Send later"
-                      >
-                        <Clock className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56">
-                      <DropdownMenuLabel className="text-muted-foreground text-xs font-normal">
-                        Send later…
-                      </DropdownMenuLabel>
-                      {SEND_LATER_PRESETS.map((p) => {
-                        const when = p.until();
-                        return (
-                          <DropdownMenuItem key={p.key} onClick={() => submit(when)}>
-                            <span className="flex-1">{p.label}</span>
-                            <span className="tabular text-muted-foreground text-[11px]">
-                              {when.toLocaleDateString(undefined, { weekday: 'short' })}{' '}
-                              {when.toLocaleTimeString(undefined, {
-                                hour: 'numeric',
-                                minute: '2-digit',
-                              })}
-                            </span>
-                          </DropdownMenuItem>
-                        );
-                      })}
-                      <DropdownMenuSeparator />
-                      <DropdownMenuLabel className="text-muted-foreground text-xs font-normal">
-                        Or a specific time
-                      </DropdownMenuLabel>
-                      <div onKeyDown={(e) => e.stopPropagation()}>
-                        <CustomTimePicker onPick={(at) => submit(at)} autoFocus={false} />
-                      </div>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
-                <Button
-                  onClick={() => submit()}
-                  loading={pending}
-                  size="icon-sm"
-                  variant={isNote ? 'default' : 'brand'}
-                  aria-label="Send"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
         </div>
       </div>
 

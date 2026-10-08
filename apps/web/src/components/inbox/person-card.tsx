@@ -75,9 +75,7 @@ export function PersonCard(p: PersonCardProps) {
         <PersonLink contactId={p.isGroup ? null : p.contactId} label={p.name}>
           <Avatar className="ring-border h-12 w-12 ring-1">
             {p.avatarUrl && <AvatarImage src={p.avatarUrl} alt={p.name} />}
-            <AvatarFallback className="type-item bg-secondary text-muted-foreground font-semibold">
-              {initials(p.name)}
-            </AvatarFallback>
+            <AvatarFallback className="type-item font-semibold">{initials(p.name)}</AvatarFallback>
           </Avatar>
         </PersonLink>
         <div className="min-w-0">

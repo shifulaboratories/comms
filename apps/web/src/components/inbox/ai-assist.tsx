@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
-import { Sparkles, FileText, Wand2 } from 'lucide-react';
+import { Sparkles, FileText, Wand2, Copy } from 'lucide-react';
+import { WorkingLabel } from '@/components/ai/ai-ui';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -76,6 +77,21 @@ export function AiAssist({
     });
   }
 
+  // While the model works, the two buttons give way to one live label — the
+  // verb, a pixel loader and the seconds elapsed — so a slow call reads as
+  // progress rather than a stuck spinner.
+  if (pending && active) {
+    return (
+      <span className="flex h-7 items-center px-2">
+        <WorkingLabel
+          label={
+            active === 'summarize' ? 'Reading the thread' : hasDraft ? 'Rewriting' : 'Drafting'
+          }
+        />
+      </span>
+    );
+  }
+
   return (
     <>
       <Button
@@ -84,7 +100,6 @@ export function AiAssist({
         size="xs"
         className="text-brand hover:bg-brand-muted hover:text-brand gap-1.5"
         onClick={suggest}
-        loading={pending && active === 'suggest'}
         disabled={pending}
         title={
           hasDraft
@@ -101,7 +116,6 @@ export function AiAssist({
         size="xs"
         className="gap-1.5"
         onClick={summarize}
-        loading={pending && active === 'summarize'}
         disabled={pending}
       >
         <FileText className="h-3.5 w-3.5" />
@@ -109,18 +123,35 @@ export function AiAssist({
       </Button>
 
       <Dialog open={summary !== null} onOpenChange={(o) => !o && setSummary(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <span className="bg-brand-muted text-brand grid h-7 w-7 place-items-center rounded-lg">
-                <Sparkles className="h-3.5 w-3.5" />
-              </span>
+        <DialogContent className="gap-0 p-0 sm:max-w-[480px]">
+          <DialogHeader className="border-border-strong space-y-0 border-b border-dashed px-5 py-4">
+            <DialogTitle className="flex items-center gap-2 text-[14px]">
+              <Sparkles className="text-brand h-4 w-4" />
               Conversation summary
             </DialogTitle>
-            <DialogDescription className="text-foreground whitespace-pre-wrap pt-2 text-[13.5px] leading-relaxed">
-              {summary}
+            <DialogDescription className="sr-only">
+              An AI summary of this conversation.
             </DialogDescription>
           </DialogHeader>
+          <p className="animate-fade-in whitespace-pre-wrap px-5 py-4 text-[13.5px] leading-relaxed">
+            {summary}
+          </p>
+          <div className="border-border-strong flex items-center justify-end gap-2 border-t border-dashed px-4 py-3">
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => {
+                if (summary) void navigator.clipboard.writeText(summary);
+                toast.success('Summary copied');
+              }}
+            >
+              <Copy className="h-3.5 w-3.5" />
+              Copy
+            </Button>
+            <Button size="sm" variant="brand" onClick={() => setSummary(null)}>
+              Done
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </>

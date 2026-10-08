@@ -61,7 +61,7 @@ export function MacroPicker({
 
   return (
     <div className="bg-popover mb-1.5 overflow-hidden rounded-xl border shadow-lg">
-      <div className="text-muted-foreground flex items-center gap-1.5 border-b px-3 py-1.5 text-[10.5px] font-medium uppercase tracking-[0.06em]">
+      <div className="type-micro text-muted-foreground flex items-center gap-1.5 border-b px-3 py-1.5">
         <Zap className="h-3 w-3" />
         Macros
         <span className="ml-auto flex items-center gap-1 normal-case tracking-normal">

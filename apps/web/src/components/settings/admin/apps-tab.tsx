@@ -98,7 +98,7 @@ function AppCard({ app }: { app: AppEntry }) {
       <div className="min-w-0 flex-1">
         <p className="flex items-center gap-2 text-sm font-medium">
           {app.name}
-          <span className="bg-secondary text-muted-foreground rounded px-1.5 py-px text-[10px] font-semibold uppercase tracking-wide">
+          <span className="bg-secondary type-micro text-muted-foreground rounded px-1.5 py-px">
             Coming soon
           </span>
         </p>
