@@ -18,16 +18,14 @@ import { conversationName } from '@/lib/naming';
 export type AiResult = { ok: true; text: string } | { ok: false; error: string };
 
 /**
- * How much of the thread the model sees — the NEWEST messages, not the oldest.
+ * How much history the AI sees.
  *
- * This used to order ascending, which on any thread longer than the window fed
- * the model the first forty messages it ever received and none of the ones
- * being replied to. A year-old conversation was answered as it stood on day
- * one. Rows are over-fetched because system messages and empty bodies are
- * dropped afterwards and would otherwise eat into the window.
+ * The cap is on rows read, not on what reaches the model: formatContext
+ * keeps only the live session verbatim and decides how much of the rest is
+ * worth a digest line or a recalled quote, weighting by age. Reading a few
+ * hundred rows is what lets an old reference ("the deposit") be found at all.
  */
-const TRANSCRIPT_MESSAGES = 40;
-const TRANSCRIPT_FETCH = 60;
+const TRANSCRIPT_FETCH = 400;
 
 async function loadTranscript(
   conversationId: string,
@@ -50,7 +48,6 @@ async function loadTranscript(
     // marker only means anything if the messages under it run forwards.
     .reverse()
     .filter((m) => m.authorType !== 'system' && (m.body ?? '').trim())
-    .slice(-TRANSCRIPT_MESSAGES)
     .map((m) => ({
       role: m.authorType === 'contact' ? 'contact' : m.isPrivateNote ? 'note' : 'agent',
       author: m.authorUser?.name ?? null,
@@ -244,9 +241,14 @@ export async function askArchiveAction(question: string): Promise<AskResult> {
         ${nameFilter}
       ))`,
     )
+    // Relevance decayed by age (60-day e-folding, floored at 35%): between
+    // two equally good matches the newer one wins, but a strong old match
+    // still beats a weak new one. Plans, addresses and prices change; the
+    // archive should surface what is true now first.
     .orderBy(
       desc(
-        sql`ts_rank(to_tsvector('english', coalesce(${messages.body}, '')), websearch_to_tsquery('english', ${q}))`,
+        sql`ts_rank(to_tsvector('english', coalesce(${messages.body}, '')), websearch_to_tsquery('english', ${q}))
+          * (0.35 + 0.65 * exp(-extract(epoch from (now() - ${messages.createdAt})) / 86400.0 / 60.0))`,
       ),
       desc(messages.createdAt),
     )

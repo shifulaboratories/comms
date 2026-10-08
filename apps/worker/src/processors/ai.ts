@@ -28,16 +28,14 @@ import {
 const log = logger.child({ module: 'ai' });
 
 /**
- * How much of the thread the model sees — the NEWEST messages, not the oldest.
+ * How much history the AI sees.
  *
- * This used to order ascending, which on any thread longer than the window fed
- * the model the first forty messages it ever received and none of the ones
- * being replied to. A year-old conversation was triaged and answered as it
- * stood on day one. Rows are over-fetched because system messages and empty
- * bodies are dropped afterwards and would otherwise eat into the window.
+ * The cap is on rows read, not on what reaches the model: formatContext
+ * keeps only the live session verbatim and decides how much of the rest is
+ * worth a digest line or a recalled quote, weighting by age. Reading a few
+ * hundred rows is what lets an old reference ("the deposit") be found at all.
  */
-const TRANSCRIPT_MESSAGES = 40;
-const TRANSCRIPT_FETCH = 60;
+const TRANSCRIPT_FETCH = 400;
 
 /** Load the recent transcript for a conversation in the AI package's shape. */
 async function loadTranscript(conversationId: string): Promise<{
@@ -62,7 +60,6 @@ async function loadTranscript(conversationId: string): Promise<{
     // marker only means anything if the messages under it run forwards.
     .reverse()
     .filter((m) => m.authorType !== 'system' && (m.body ?? '').trim())
-    .slice(-TRANSCRIPT_MESSAGES)
     .map((m) => ({
       role: m.authorType === 'contact' ? 'contact' : m.isPrivateNote ? 'note' : 'agent',
       author: m.authorUser?.name ?? null,
