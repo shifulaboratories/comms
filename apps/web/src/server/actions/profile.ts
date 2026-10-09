@@ -177,3 +177,31 @@ export async function updateKeymap(input: {
   revalidatePath('/', 'layout');
   return { ok: true };
 }
+
+/**
+ * Your time zone — what "today" means when the AI drafts or answers for you.
+ * Validated against the runtime's zone database; empty clears it, which falls
+ * back to the workspace's business-hours zone.
+ */
+export async function updateTimeZone(timeZone: string): Promise<ActionResult> {
+  const me = await requireWriter();
+  const tz = timeZone.trim();
+  if (tz) {
+    try {
+      new Intl.DateTimeFormat('en-US', { timeZone: tz });
+    } catch {
+      return { ok: false, error: 'Unknown time zone.' };
+    }
+  }
+  const row = await db.query.users.findFirst({
+    where: eq(users.id, me.id),
+    columns: { preferences: true },
+  });
+  const { timeZone: _old, ...rest } = row?.preferences ?? {};
+  await db
+    .update(users)
+    .set({ preferences: tz ? { ...rest, timeZone: tz } : rest })
+    .where(eq(users.id, me.id));
+  revalidatePath('/settings/preferences');
+  return { ok: true };
+}

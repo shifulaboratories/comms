@@ -71,7 +71,13 @@ export type AiJob =
   | { type: 'triage'; conversationId: string }
   | { type: 'precompute'; conversationId: string }
   /** Group active conversations into named bundles (Shortwave-style). */
-  | { type: 'bundle' };
+  | { type: 'bundle' }
+  /** Summarize finished sessions of one conversation and update what is known about the person. */
+  | { type: 'memory'; conversationId: string }
+  /** Find conversations with finished sessions not yet in memory, and queue them. */
+  | { type: 'memorySweep' }
+  /** Embed messages that have no vector yet (only when embeddings are configured). */
+  | { type: 'embed' };
 
 /** The AI jobs that are about one conversation, and so can be collapsed per thread. */
 export type ConversationAiJob = Extract<AiJob, { conversationId: string }>;

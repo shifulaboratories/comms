@@ -24,6 +24,9 @@ export function SiteFooter() {
           <Link href="/pricing" className="text-muted-foreground hover:text-foreground block">
             Pricing
           </Link>
+          <Link href="/contact" className="text-muted-foreground hover:text-foreground block">
+            Contact
+          </Link>
         </div>
         <div className="space-y-2.5">
           <p className="text-subtle text-xs font-medium uppercase tracking-wider">Open source</p>

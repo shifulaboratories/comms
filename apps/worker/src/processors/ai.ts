@@ -8,6 +8,13 @@ import {
   assignBundles,
   type BundleCandidate,
   type TranscriptMessage,
+  loadConversationForAi,
+  contextTuning,
+  splitSessions,
+  summarizeSession,
+  embeddingsConfig,
+  embedTexts,
+  getActiveProvider,
 } from '@comms/ai';
 import { getDb, eq, and, desc, inArray, isNull, sql } from '@comms/db';
 import {
@@ -17,7 +24,11 @@ import {
   tagSuggestions,
   bundles,
   appSettings,
+  conversationSessions,
+  contactFacts,
+  messageEmbeddings,
 } from '@comms/db';
+import { enqueueAiForConversation } from '@comms/core';
 import {
   isTriageStale,
   modelMaySetPriority,
@@ -28,49 +39,14 @@ import {
 const log = logger.child({ module: 'ai' });
 
 /**
- * How much of the thread the model sees — the NEWEST messages, not the oldest.
- *
- * This used to order ascending, which on any thread longer than the window fed
- * the model the first forty messages it ever received and none of the ones
- * being replied to. A year-old conversation was triaged and answered as it
- * stood on day one. Rows are over-fetched because system messages and empty
- * bodies are dropped afterwards and would otherwise eat into the window.
+ * The conversation as every AI feature sees it — transcript plus memory,
+ * similarity, time zone and tuning. Shared with the web app; see
+ * loadConversationForAi in @comms/ai. Background jobs have no acting user,
+ * so "today" is the workspace's time zone.
  */
-const TRANSCRIPT_MESSAGES = 40;
-const TRANSCRIPT_FETCH = 60;
-
-/** Load the recent transcript for a conversation in the AI package's shape. */
-async function loadTranscript(conversationId: string): Promise<{
-  transcript: TranscriptMessage[];
-  contactName: string | null;
-}> {
-  const db = getDb();
-  const conv = await db.query.conversations.findFirst({
-    where: eq(conversations.id, conversationId),
-    with: { contact: { columns: { displayName: true } } },
-  });
-
-  const rows = await db.query.messages.findMany({
-    where: and(eq(messages.conversationId, conversationId), eq(messages.isRetracted, false)),
-    orderBy: [desc(messages.createdAt)],
-    limit: TRANSCRIPT_FETCH,
-    with: { authorUser: { columns: { name: true } } },
-  });
-
-  const transcript: TranscriptMessage[] = rows
-    // Back to chronological: the prompts all say "oldest first", and an age
-    // marker only means anything if the messages under it run forwards.
-    .reverse()
-    .filter((m) => m.authorType !== 'system' && (m.body ?? '').trim())
-    .slice(-TRANSCRIPT_MESSAGES)
-    .map((m) => ({
-      role: m.authorType === 'contact' ? 'contact' : m.isPrivateNote ? 'note' : 'agent',
-      author: m.authorUser?.name ?? null,
-      text: m.body ?? '',
-      at: m.createdAt,
-    }));
-
-  return { transcript, contactName: conv?.contact?.displayName ?? null };
+async function loadTranscript(conversationId: string) {
+  const loaded = await loadConversationForAi(conversationId);
+  return loaded ?? { transcript: [], contactName: null, contactId: null, context: {} };
 }
 
 /** Merge a patch into conversations.metadata.ai without clobbering siblings. */
@@ -125,7 +101,7 @@ async function precompute(conversationId: string): Promise<void> {
     return;
   }
 
-  const { transcript, contactName } = await loadTranscript(conversationId);
+  const { transcript, contactName, context } = await loadTranscript(conversationId);
   if (transcript.length === 0) return;
 
   // Brand voice: recent real agent replies, so drafts sound like the team.
@@ -145,14 +121,16 @@ async function precompute(conversationId: string): Promise<void> {
     .slice(0, 6);
 
   const [summary, draft] = await Promise.all([
-    summarizeConversation({ contactName, messages: transcript }).catch((err) => {
+    summarizeConversation({ contactName, messages: transcript, context }).catch((err) => {
       log.warn({ conversationId, err: (err as Error).message }, 'summary precompute failed');
       return null;
     }),
-    suggestReply({ contactName, messages: transcript, brandVoiceExamples }).catch((err) => {
-      log.warn({ conversationId, err: (err as Error).message }, 'draft precompute failed');
-      return null;
-    }),
+    suggestReply({ contactName, messages: transcript, brandVoiceExamples, context }).catch(
+      (err) => {
+        log.warn({ conversationId, err: (err as Error).message }, 'draft precompute failed');
+        return null;
+      },
+    ),
   ]);
 
   const patch: Record<string, unknown> = {};
@@ -192,12 +170,12 @@ async function triage(conversationId: string): Promise<void> {
     return;
   }
 
-  const { transcript, contactName } = await loadTranscript(conversationId);
+  const { transcript, contactName, context } = await loadTranscript(conversationId);
   if (transcript.length === 0) return;
 
   let result;
   try {
-    result = await triageConversation({ contactName, messages: transcript });
+    result = await triageConversation({ contactName, messages: transcript, context });
   } catch (err) {
     log.warn({ conversationId, err: (err as Error).message }, 'triage failed');
     return;
@@ -360,7 +338,243 @@ async function bundleSweep(): Promise<void> {
   }
 }
 
+// ---- Long-term memory --------------------------------------------------------
+
+/** Sessions summarized per job. A backlog drains over successive sweeps. */
+const MEMORY_SESSIONS_PER_JOB = 5;
+/** Only the most recent sessions are worth summarizing on a first pass. */
+const MEMORY_LOOKBACK_SESSIONS = 12;
+
+/**
+ * Summarize the finished sessions of one conversation and fold what they
+ * reveal about the person into their facts.
+ *
+ * A session is finished once the thread has been quiet for the session gap.
+ * Sessions are processed oldest first so a newer fact ("moved to Denver")
+ * lands after, and replaces, an older one ("lives in Austin"). Facts are only
+ * kept for one-to-one threads with a real person — in a group chat the model
+ * cannot reliably tell whose fact is whose.
+ */
+async function memory(conversationId: string): Promise<void> {
+  const db = getDb();
+  const conv = await db.query.conversations.findFirst({
+    where: eq(conversations.id, conversationId),
+    columns: { id: true, contactId: true, isGroup: true, kind: true, metadata: true },
+    with: { contact: { columns: { displayName: true } } },
+  });
+  if (!conv || conv.kind === 'automated' || conv.kind === 'otp') return;
+
+  const { sessionGapMs } = await contextTuning();
+  const rows = await db.query.messages.findMany({
+    where: and(eq(messages.conversationId, conversationId), eq(messages.isRetracted, false)),
+    orderBy: [desc(messages.createdAt)],
+    limit: 400,
+    with: { authorUser: { columns: { name: true } } },
+  });
+  const transcript: TranscriptMessage[] = rows
+    .reverse()
+    .filter((m) => m.authorType !== 'system' && (m.body ?? '').trim())
+    .map((m) => ({
+      id: m.id,
+      role: m.authorType === 'contact' ? 'contact' : m.isPrivateNote ? 'note' : 'agent',
+      author: m.authorUser?.name ?? null,
+      text: m.body ?? '',
+      at: m.createdAt,
+    }));
+
+  const now = Date.now();
+  const finished = splitSessions(transcript, sessionGapMs)
+    .filter((s) => s.start && s.end && now - s.end.getTime() >= sessionGapMs)
+    .filter((s) => s.messages.length >= 2)
+    .slice(-MEMORY_LOOKBACK_SESSIONS);
+
+  const stored = await db.query.conversationSessions.findMany({
+    where: eq(conversationSessions.conversationId, conversationId),
+    columns: { startedAt: true },
+  });
+  const done = new Set(stored.map((s) => s.startedAt.getTime()));
+  const pending = finished.filter((s) => !done.has(s.start!.getTime()));
+  const batch = pending.slice(0, MEMORY_SESSIONS_PER_JOB);
+
+  const keepFacts = Boolean(conv.contactId) && !conv.isGroup && conv.kind === 'person';
+  const provider = await getActiveProvider().catch(() => null);
+
+  for (const s of batch) {
+    const known = keepFacts
+      ? await db.query.contactFacts.findMany({ where: eq(contactFacts.contactId, conv.contactId!) })
+      : [];
+    let result;
+    try {
+      result = await summarizeSession({
+        contactName: conv.contact?.displayName ?? null,
+        messages: s.messages,
+        knownFacts: known.map((f) => ({ key: f.key, value: f.value })),
+        now: s.end!,
+      });
+    } catch (err) {
+      log.warn({ conversationId, err: (err as Error).message }, 'session summary failed');
+      return; // try again on the next sweep
+    }
+    if (!result.summary) continue;
+
+    await db
+      .insert(conversationSessions)
+      .values({
+        conversationId,
+        startedAt: s.start!,
+        endedAt: s.end!,
+        messageCount: s.messages.length,
+        summary: result.summary,
+        model: provider?.model ?? null,
+      })
+      .onConflictDoUpdate({
+        target: [conversationSessions.conversationId, conversationSessions.startedAt],
+        set: { endedAt: s.end!, messageCount: s.messages.length, summary: result.summary },
+      });
+
+    if (!keepFacts) continue;
+    const human = new Set(known.filter((f) => f.source === 'human').map((f) => f.key));
+    const current = new Map(known.map((f) => [f.key, f.value.trim().toLowerCase()]));
+    for (const f of result.facts) {
+      // What a person typed into the card is never overwritten by the model.
+      if (human.has(f.key)) continue;
+      // A fact repeated unchanged keeps the date it was first learned, or an
+      // old fact would look freshly confirmed every time the model echoed it.
+      if (current.get(f.key) === f.value.trim().toLowerCase()) continue;
+      await db
+        .insert(contactFacts)
+        .values({
+          contactId: conv.contactId!,
+          key: f.key,
+          value: f.value,
+          source: 'ai',
+          sourceConversationId: conversationId,
+          learnedAt: s.end!,
+        })
+        .onConflictDoUpdate({
+          target: [contactFacts.contactId, contactFacts.key],
+          set: { value: f.value, learnedAt: s.end!, sourceConversationId: conversationId },
+          // Only replace an AI fact; a human one is left as the person set it.
+          setWhere: eq(contactFacts.source, 'ai'),
+        });
+    }
+    for (const key of result.forget) {
+      if (human.has(key)) continue;
+      await db
+        .delete(contactFacts)
+        .where(
+          and(
+            eq(contactFacts.contactId, conv.contactId!),
+            eq(contactFacts.key, key),
+            eq(contactFacts.source, 'ai'),
+          ),
+        );
+    }
+  }
+
+  // Mark the thread as remembered only when nothing is left, so a backlog
+  // keeps being picked up by the sweep until it is through.
+  if (pending.length <= batch.length) {
+    const meta = (conv.metadata ?? {}) as Record<string, unknown>;
+    const ai = (meta.ai ?? {}) as Record<string, unknown>;
+    await db
+      .update(conversations)
+      .set({ metadata: { ...meta, ai: { ...ai, memoryAt: new Date().toISOString() } } })
+      .where(eq(conversations.id, conversationId));
+  }
+  if (batch.length) log.info({ conversationId, sessions: batch.length }, 'memory updated');
+}
+
+/**
+ * Queue memory work for threads that have gone quiet since they were last
+ * remembered. Cheap: one indexed query, at most 50 jobs, each collapsed per
+ * conversation so a slow sweep can't stack duplicates.
+ */
+async function memorySweep(): Promise<void> {
+  const db = getDb();
+  const { sessionGapMs } = await contextTuning();
+  const quietSince = new Date(Date.now() - sessionGapMs);
+  const rows = await db
+    .select({ id: conversations.id })
+    .from(conversations)
+    .where(
+      and(
+        sql`${conversations.lastMessageAt} > now() - interval '180 days'`,
+        sql`${conversations.lastMessageAt} < ${quietSince}`,
+        sql`${conversations.kind} not in ('automated', 'otp')`,
+        sql`(${conversations.metadata}->'ai'->>'memoryAt' is null
+             or (${conversations.metadata}->'ai'->>'memoryAt')::timestamptz < ${conversations.lastMessageAt})`,
+      ),
+    )
+    .orderBy(desc(conversations.lastMessageAt))
+    .limit(50);
+  for (const r of rows) {
+    await enqueueAiForConversation({ type: 'memory', conversationId: r.id }, { delayMs: 0 });
+  }
+  if (rows.length) log.info({ queued: rows.length }, 'memory sweep queued');
+}
+
+/**
+ * Embed messages that have no vector yet, newest first, in batches. Runs only
+ * when an embeddings provider is configured; without one this is a no-op and
+ * recall stays keyword-based.
+ */
+async function embedSweep(): Promise<void> {
+  const cfg = embeddingsConfig();
+  if (!cfg) return;
+  const db = getDb();
+  const rows = await db
+    .select({ id: messages.id, conversationId: messages.conversationId, body: messages.body })
+    .from(messages)
+    .leftJoin(
+      messageEmbeddings,
+      and(eq(messageEmbeddings.messageId, messages.id), eq(messageEmbeddings.model, cfg.model)),
+    )
+    .where(
+      and(
+        isNull(messageEmbeddings.messageId),
+        sql`coalesce(${messages.body}, '') <> ''`,
+        sql`${messages.authorType} <> 'system'`,
+        eq(messages.isRetracted, false),
+      ),
+    )
+    .orderBy(desc(messages.createdAt))
+    .limit(256);
+  for (let i = 0; i < rows.length; i += 64) {
+    const chunk = rows.slice(i, i + 64);
+    let vectors: number[][];
+    try {
+      vectors = await embedTexts(
+        chunk.map((r) => r.body ?? ''),
+        cfg,
+      );
+    } catch (err) {
+      log.warn({ err: (err as Error).message }, 'embedding batch failed');
+      return;
+    }
+    await db
+      .insert(messageEmbeddings)
+      .values(
+        chunk.map((r, j) => ({
+          messageId: r.id,
+          conversationId: r.conversationId,
+          model: cfg.model,
+          embedding: vectors[j]!,
+        })),
+      )
+      // A message re-embedded under a new model replaces its old vector.
+      .onConflictDoUpdate({
+        target: messageEmbeddings.messageId,
+        set: { model: cfg.model, embedding: sql`excluded.embedding`, createdAt: new Date() },
+      });
+  }
+  if (rows.length) log.info({ embedded: rows.length }, 'embedded messages');
+}
+
 export async function processAiJob(job: Job<AiJob>): Promise<void> {
+  // Embeddings use their own provider, so they run whether or not a chat
+  // model is configured.
+  if (job.data.type === 'embed') return embedSweep();
   if (!(await isAiConfigured())) return;
   switch (job.data.type) {
     case 'triage':
@@ -369,5 +583,9 @@ export async function processAiJob(job: Job<AiJob>): Promise<void> {
       return precompute(job.data.conversationId);
     case 'bundle':
       return bundleSweep();
+    case 'memory':
+      return memory(job.data.conversationId);
+    case 'memorySweep':
+      return memorySweep();
   }
 }

@@ -4,3 +4,7 @@ export * from './features.js';
 export * from './provider.js';
 export * from './models.js';
 export { extractJsonObject } from './openai-compat.js';
+export * from './context.js';
+export * from './embeddings.js';
+export * from './memory.js';
+export * from './load.js';

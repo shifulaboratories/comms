@@ -20,6 +20,8 @@ import {
   sanitizeQuery,
   type QueryCondition,
   type FolderQuery,
+  contactFacts,
+  conversationSessions,
 } from '@comms/db';
 import { db } from '@/server/db';
 import { INBOX_STATUSES } from '@/lib/conversation-folder';
@@ -980,5 +982,41 @@ export async function getIntroContext(
     conversationCount: Number(count[0]?.n ?? 0),
     firstInboundBody: firstInbound?.body ?? null,
     firstInboundAt: firstInbound?.createdAt ?? null,
+  };
+}
+
+
+/**
+ * What the AI remembers for the details panel: facts about the person and
+ * the most recent session summaries for this thread.
+ */
+export async function getMemory(conversationId: string, contactId: string | null) {
+  const [facts, sessions] = await Promise.all([
+    contactId
+      ? db.query.contactFacts.findMany({
+          where: eq(contactFacts.contactId, contactId),
+          orderBy: [desc(contactFacts.learnedAt)],
+        })
+      : Promise.resolve([]),
+    db.query.conversationSessions.findMany({
+      where: eq(conversationSessions.conversationId, conversationId),
+      orderBy: [desc(conversationSessions.endedAt)],
+      limit: 5,
+    }),
+  ]);
+  return {
+    facts: facts.map((f) => ({
+      id: f.id,
+      key: f.key,
+      value: f.value,
+      source: f.source,
+      learnedAt: f.learnedAt.toISOString(),
+    })),
+    sessions: sessions.map((x) => ({
+      id: x.id,
+      endedAt: x.endedAt.toISOString(),
+      messageCount: x.messageCount,
+      summary: x.summary,
+    })),
   };
 }

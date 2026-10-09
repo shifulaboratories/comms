@@ -2,6 +2,7 @@ import { resolvePreferences } from '@comms/db';
 import { requireDbUser } from '@/lib/session';
 import { AppearanceForm } from '@/components/settings/appearance-form';
 import { NotificationPreferences } from '@/components/settings/notification-preferences';
+import { TimeZoneForm } from '@/components/settings/time-zone-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export const dynamic = 'force-dynamic';
@@ -25,6 +26,15 @@ export default async function PreferencesSettingsPage() {
         </CardHeader>
         <CardContent>
           <AppearanceForm />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Time zone</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <TimeZoneForm current={me.preferences?.timeZone ?? null} />
         </CardContent>
       </Card>
 

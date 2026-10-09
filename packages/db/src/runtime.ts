@@ -23,6 +23,12 @@ export interface RuntimeOverrides {
   sendDailyCap?: number;
   /** Minimum pause between sends on one number, in milliseconds. */
   sendMinIntervalMs?: number;
+  /** AI context: a quiet stretch this many hours long ends a session. */
+  contextSessionGapHours?: number;
+  /** AI context: an older session counts half as much every this many days. */
+  contextHalfLifeDays?: number;
+  /** AI context: a silence this many days long is called out to the model. */
+  contextLongGapDays?: number;
 }
 
 const KEY = 'runtime_overrides';
@@ -33,6 +39,9 @@ const LIMITS: Record<keyof RuntimeOverrides, { min: number; max: number }> = {
   sendHourlyCap: { min: 1, max: 1000 },
   sendDailyCap: { min: 1, max: 10000 },
   sendMinIntervalMs: { min: 0, max: 60_000 },
+  contextSessionGapHours: { min: 1, max: 72 },
+  contextHalfLifeDays: { min: 1, max: 365 },
+  contextLongGapDays: { min: 1, max: 365 },
 };
 
 export function clampRuntimeOverrides(input: RuntimeOverrides): RuntimeOverrides {

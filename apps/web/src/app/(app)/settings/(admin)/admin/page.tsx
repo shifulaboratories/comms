@@ -1,7 +1,7 @@
 import { requirePermissionPage } from '@/lib/session';
 import { loadConfig } from '@comms/core';
 import { getRuntimeOverrides } from '@comms/db';
-import { KNOWN_MODELS, SUGGESTED_MODELS } from '@comms/ai';
+import { CONTEXT_DEFAULTS, KNOWN_MODELS, SUGGESTED_MODELS } from '@comms/ai';
 import {
   getAdminOverview,
   getSystemHealth,
@@ -93,6 +93,9 @@ export default async function AdminPanelPage() {
           sendHourlyCap: cfg.SEND_HOURLY_CAP,
           sendDailyCap: cfg.SEND_DAILY_CAP,
           sendMinIntervalMs: cfg.SEND_MIN_INTERVAL_MS,
+          contextSessionGapHours: CONTEXT_DEFAULTS.sessionGapHours,
+          contextHalfLifeDays: CONTEXT_DEFAULTS.halfLifeDays,
+          contextLongGapDays: CONTEXT_DEFAULTS.longGapDays,
         }}
         readOnlyConfig={readOnlyConfig}
         suggestedModels={SUGGESTED_MODELS}

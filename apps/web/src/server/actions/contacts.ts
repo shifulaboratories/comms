@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { and, eq } from '@comms/db';
-import { contacts, contactIdentities } from '@comms/db';
+import { contacts, contactIdentities, contactFacts } from '@comms/db';
 import { normalizeAddress } from '@comms/core';
 import { db } from '@/server/db';
 import { requireUser, requireWriter } from '@/lib/session';
@@ -200,5 +200,48 @@ export async function setContactOptOut(input: {
 
   revalidatePath('/inbox');
   revalidatePath(`/people/${input.contactId}`);
+  return { ok: true };
+}
+
+/**
+ * Facts the AI keeps about a person (see contact_facts). A person can add one
+ * by hand — which the model will then never overwrite — or delete a wrong
+ * one, which the model may relearn only if it comes up again.
+ */
+export async function addContactFact(input: {
+  contactId: string;
+  key: string;
+  value: string;
+}): Promise<ActionResult> {
+  await requireWriter();
+  const key = input.key
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 40);
+  const value = input.value.trim().slice(0, 200);
+  if (!key || !/^[a-z]/.test(key)) return { ok: false, error: 'Give the fact a short label.' };
+  if (!value) return { ok: false, error: 'Write the fact.' };
+
+  await db
+    .insert(contactFacts)
+    .values({ contactId: input.contactId, key, value, source: 'human', learnedAt: new Date() })
+    .onConflictDoUpdate({
+      target: [contactFacts.contactId, contactFacts.key],
+      set: { value, source: 'human', learnedAt: new Date() },
+    });
+  revalidatePath('/inbox');
+  revalidatePath(`/people/${input.contactId}`);
+  return { ok: true };
+}
+
+export async function deleteContactFact(input: { factId: string }): Promise<ActionResult> {
+  await requireWriter();
+  const fact = await db.query.contactFacts.findFirst({ where: eq(contactFacts.id, input.factId) });
+  if (!fact) return { ok: true };
+  await db.delete(contactFacts).where(eq(contactFacts.id, input.factId));
+  revalidatePath('/inbox');
+  revalidatePath(`/people/${fact.contactId}`);
   return { ok: true };
 }
