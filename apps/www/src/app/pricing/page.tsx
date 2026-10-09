@@ -1,19 +1,20 @@
 import type { Metadata } from 'next';
 import { site } from '@/lib/site';
 import { SpotlightGroup } from '@/components/ui/spotlight';
-import { Check } from '@/components/ui/icons';
+import { Arrow, Check } from '@/components/ui/icons';
 
 export const metadata: Metadata = {
   title: 'Pricing',
   description:
-    'Self-host Comms free forever under the AGPLv3, or let us run it. Enterprise adds SSO, audit retention and billing.',
+    'Self-host Comms free forever under the AGPLv3, or have us set it up on your infrastructure and build the integrations your organization needs.',
 };
 
 /**
- * The tiers mirror the licensing structure exactly: everything in the "Free"
- * column is AGPLv3 in the repository, and every "Enterprise" line maps to a
- * feature key in packages/enterprise/src/features.ts. If the two ever disagree,
- * this page is the one that is wrong.
+ * Two ways to run Comms. Everything in "Self-hosted" is AGPLv3 in the
+ * repository. "Enterprise" is a service engagement on top: we deploy it on
+ * infrastructure the customer owns, build what they need, and license the
+ * features in packages/enterprise/src/features.ts. There is no hosted plan —
+ * the data always lives with the customer.
  */
 const tiers = [
   {
@@ -29,64 +30,93 @@ const tiers = [
       'Internal notes, tags, folders, saved views',
       'Role-based access control',
       'Email + password, magic links, Google and GitHub sign-in',
-      'Audit trail of sensitive actions',
-      'AI summaries, suggested replies and triage (your API key)',
+      'AI summaries, suggested replies, triage and memory (your API key)',
       'Community support on GitHub',
-    ],
-  },
-  {
-    name: 'Cloud',
-    price: '$12',
-    cadence: 'per user / month',
-    summary: 'The same build, run by us. For teams who would rather not operate Postgres.',
-    cta: { label: 'Start a trial', href: '/pricing#cloud', external: false },
-    highlight: true,
-    features: [
-      'Everything in Self-hosted',
-      'Managed Postgres, Redis and object storage',
-      'Automatic updates, backups and monitoring',
-      'Email delivery and AI features included — no keys to supply',
-      'Email support, next business day',
     ],
   },
   {
     name: 'Enterprise',
     price: 'Custom',
-    cadence: 'annual',
-    summary: 'For teams with a procurement process. Available on Cloud or self-hosted.',
-    cta: { label: 'Talk to us', href: '/pricing#enterprise', external: false },
-    highlight: false,
+    cadence: 'scoped to your organization',
+    summary:
+      'We set Comms up for you, on infrastructure you own, and build it out around how your team actually works.',
+    cta: { label: 'Contact us', href: site.contact, external: false },
+    highlight: true,
     features: [
-      'Everything in Cloud',
-      'SAML 2.0 / OIDC against your identity provider',
-      'SCIM provisioning and domain-verified auto-join',
-      'Audit log retention windows and CSV / SIEM export',
-      'Self-hosted license key — verified offline, no phone home',
-      'Priority support and an SLA',
+      'Everything in Self-hosted',
+      'Deployed and configured by us — your cloud account, your servers, your data',
+      'Custom integrations: CRM, help desk, internal tools, webhooks and new channels',
+      'Mac and BlueBubbles bridge setup, with monitoring',
+      'SAML 2.0 / OIDC, SCIM provisioning and domain-verified auto-join',
+      'Audit log retention and CSV / SIEM export',
+      'Updates, backups and maintenance handled for you',
+      'Onboarding for your team, priority support and an SLA',
     ],
+  },
+] as const;
+
+const steps = [
+  {
+    n: '01',
+    title: 'A call about your workflow',
+    body: 'Who answers, what they answer with, and which systems the answers live in. We leave with a written scope and a fixed quote.',
+  },
+  {
+    n: '02',
+    title: 'We build and deploy it',
+    body: 'Comms goes up on infrastructure you own, connected to your number, your sign-in and the tools you already use — plus anything custom you need.',
+  },
+  {
+    n: '03',
+    title: 'We keep it running',
+    body: 'Updates, backups and the iMessage bridge are watched for you. New integrations and changes as your team grows.',
+  },
+] as const;
+
+const builds = [
+  {
+    title: 'CRM sync',
+    body: 'Contacts, deals and conversation history flow both ways with Salesforce, HubSpot or your own database.',
+  },
+  {
+    title: 'Help desk handoff',
+    body: 'Escalate a thread into Zendesk, Linear or Jira and keep the ticket and the texts linked.',
+  },
+  {
+    title: 'Internal tools',
+    body: 'Look up orders, bookings or accounts from inside a conversation, and act on them without switching tabs.',
+  },
+  {
+    title: 'Automations',
+    body: 'Routing, auto-replies and follow-ups tied to your business rules, not generic templates.',
+  },
+  { title: 'New channels', body: 'SMS, WhatsApp or email alongside iMessage, in the same inbox.' },
+  {
+    title: 'AI tuned to you',
+    body: 'Replies in your voice, grounded in your docs and policies, running on the model and provider you choose.',
   },
 ] as const;
 
 const faqs = [
   {
     q: 'Is the free version crippled?',
-    a: 'No. The shared inbox, ticketing, macros, automations, AI features and the BlueBubbles bridge are all AGPLv3, with no seat limit and no key. What is paid for is billing, enterprise identity, and compliance tooling — the things a company with a procurement process needs and a self-hoster never touches.',
+    a: 'No. The shared inbox, ticketing, macros, automations, AI features and the BlueBubbles bridge are all AGPLv3, with no seat limit and no key. Enterprise is for organizations that want it set up, extended and looked after for them.',
+  },
+  {
+    q: 'Do you host it for us?',
+    a: 'No — and that is on purpose. Comms runs on infrastructure you own: your cloud account, your servers, or a provider you pick. We do the setup and the upkeep there, so your messages never sit on our systems and you are never locked in.',
+  },
+  {
+    q: 'What does a custom integration look like?',
+    a: 'Anything with an API. Common ones are CRM sync, escalating threads into a help desk, looking up customer records inside a conversation, and adding channels like SMS or WhatsApp. We scope each one with you before building it.',
   },
   {
     q: 'What does AGPLv3 mean for me?',
     a: 'If you run Comms for your own team — even commercially, even at scale — it means nothing you need to act on. The obligation only bites if you modify Comms and offer the modified version to other people over a network: then you owe those users your changes. Running it unmodified, or keeping your changes to yourself internally, is fine.',
   },
   {
-    q: 'Can I run Comms as a service for my own customers?',
-    a: 'Yes. The AGPLv3 permits commercial hosting. You would need to publish your modifications to the users of that service, and you could not use anything under packages/enterprise/ without a subscription.',
-  },
-  {
-    q: 'Is Cloud a different codebase?',
-    a: 'No. Cloud is this repository with billing switched on. That is deliberate: a fork we maintain privately would drift, and the self-hosted build would quietly become the worse one.',
-  },
-  {
-    q: 'What happens if my subscription lapses?',
-    a: 'Enterprise features keep working for a 14-day grace period, then switch off. Nothing else changes — the inbox keeps serving messages, your data stays yours, and an expired key never takes the app down. Self-hosted installs verify the key offline, so an outage on our side cannot lock you out.',
+    q: 'Who owns the custom work?',
+    a: 'You do. Integrations we build for you are delivered into your repository and run on your infrastructure. If you stop working with us, everything keeps running.',
   },
 ] as const;
 
@@ -104,20 +134,20 @@ export default function PricingPage() {
             className="text-gradient animate-rise mx-auto mt-3 max-w-[16ch] text-5xl leading-[1.02] sm:text-7xl"
             style={{ ['--delay' as string]: '80ms' }}
           >
-            Own it free. Or let us run it.
+            Own it free. Or have us build it for you.
           </h1>
           <p
             className="animate-rise text-muted-foreground mx-auto mt-6 max-w-[56ch] text-lg leading-relaxed"
             style={{ ['--delay' as string]: '180ms' }}
           >
-            Self-host the whole product free, forever. Pay us only if you would rather not run it
-            yourself, or if you need the enterprise identity and compliance pieces.
+            Self-host the whole product free, forever. Or work with us: we set it up on your
+            infrastructure, connect it to your tools and build whatever your team needs on top.
           </p>
         </div>
       </section>
 
       <section className="container pb-6">
-        <SpotlightGroup className="grid gap-4 lg:grid-cols-3">
+        <SpotlightGroup className="mx-auto grid max-w-5xl gap-4 lg:grid-cols-2">
           {tiers.map((tier, i) => (
             <div
               key={tier.name}
@@ -140,7 +170,7 @@ export default function PricingPage() {
                 <h2 className="text-lg">{tier.name}</h2>
                 {tier.highlight && (
                   <span className="bg-accent/15 text-accent-soft ring-accent/30 rounded-full px-2.5 py-0.5 text-[11px] font-medium ring-1 ring-inset">
-                    Most popular
+                    Done for you
                   </span>
                 )}
               </div>
@@ -177,6 +207,59 @@ export default function PricingPage() {
             </div>
           ))}
         </SpotlightGroup>
+      </section>
+
+      <section className="container pt-28">
+        <div data-reveal className="mx-auto max-w-2xl text-center">
+          <p className="text-accent-soft text-[13px] font-medium">How Enterprise works</p>
+          <h2 className="text-gradient mt-3 text-4xl leading-[1.05] sm:text-5xl">
+            From first call to running in your stack.
+          </h2>
+        </div>
+        <div className="mt-14 grid gap-4 md:grid-cols-3">
+          {steps.map((step, i) => (
+            <div
+              key={step.n}
+              data-reveal
+              style={{ ['--delay' as string]: `${i * 100}ms` }}
+              className="panel rounded-3xl p-7"
+            >
+              <p className="text-accent-soft font-mono text-[12px]">{step.n}</p>
+              <h3 className="mt-4 text-lg">{step.title}</h3>
+              <p className="text-muted-foreground mt-3 text-sm leading-relaxed">{step.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="container pt-28">
+        <div className="grid gap-10 lg:grid-cols-[1fr_1.5fr]">
+          <div data-reveal className="max-w-md">
+            <p className="text-accent-soft text-[13px] font-medium">What we build</p>
+            <h2 className="text-gradient mt-3 text-4xl leading-[1.05] sm:text-5xl">
+              Comms, wired into everything else.
+            </h2>
+            <p className="text-muted-foreground mt-5 text-sm leading-relaxed">
+              A few of the integrations teams ask for. If it has an API, we can connect it.
+            </p>
+            <a href={site.contact} className="btn-primary mt-8 h-11 px-5">
+              Tell us what you need <Arrow className="h-4 w-4" />
+            </a>
+          </div>
+          <SpotlightGroup className="grid gap-3 sm:grid-cols-2">
+            {builds.map((b, i) => (
+              <div
+                key={b.title}
+                data-reveal
+                style={{ ['--delay' as string]: `${i * 60}ms` }}
+                className="spotlight panel rounded-2xl p-5"
+              >
+                <h3 className="text-[15px] font-medium">{b.title}</h3>
+                <p className="text-muted-foreground mt-2 text-[13.5px] leading-relaxed">{b.body}</p>
+              </div>
+            ))}
+          </SpotlightGroup>
+        </div>
       </section>
 
       <section className="container py-28">

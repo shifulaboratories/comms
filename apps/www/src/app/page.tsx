@@ -57,11 +57,11 @@ const FAQ = [
   },
   {
     q: 'Is the free version cut down?',
-    a: 'No. The shared inbox, ticketing, macros, automations, AI features and the bridge are all AGPLv3 with no seat limit. Paid plans add hosting, and enterprise SSO and compliance tooling.',
+    a: 'No. The shared inbox, ticketing, macros, automations, AI features and the bridge are all AGPLv3 with no seat limit. Enterprise adds a team that sets it up for you, custom integrations, SSO and compliance tooling.',
   },
   {
     q: 'Where do my messages live?',
-    a: 'In your Postgres, on your infrastructure — or ours on Cloud. No third party sits in the message path, and AI features only run if you add a key.',
+    a: 'In your Postgres, on infrastructure you own — even when we set it up for you. No third party sits in the message path, and AI features only run if you add a key.',
   },
   {
     q: 'Is it only for iMessage?',
@@ -112,8 +112,8 @@ export default function HomePage() {
             className="animate-rise mt-9 flex flex-wrap items-center justify-center gap-3"
             style={{ ['--delay' as string]: '440ms' }}
           >
-            <Link href={site.trial} className="btn-primary h-12 px-6">
-              Start free <Arrow className="h-4 w-4" />
+            <Link href={site.contact} className="btn-primary h-12 px-6">
+              Get in touch <Arrow className="h-4 w-4" />
             </Link>
             <a href={site.github} target="_blank" rel="noreferrer" className="btn-ghost h-12 px-6">
               <GitHubIcon className="h-4 w-4" /> Self-host it
@@ -258,7 +258,11 @@ export default function HomePage() {
 
       {/* ── Plans teaser ───────────────────────────────────────────────── */}
       <section className="container py-28 sm:py-36">
-        <SectionHead eyebrow="Pricing" title="Free to own. Cheap to rent." />
+        <SectionHead
+          eyebrow="Pricing"
+          title="Free to own. Built around you if you need it."
+          body="Run it yourself at no cost, or have us deploy it on your infrastructure and build the integrations your team needs."
+        />
         <div className="mx-auto mt-14 grid max-w-4xl gap-4 md:grid-cols-2">
           <Plan
             name="Self-hosted"
@@ -272,25 +276,25 @@ export default function HomePage() {
             cta={{ label: 'Deploy it yourself', href: site.github, external: true }}
           />
           <Plan
-            name="Cloud"
-            price="$12"
-            cadence="per user / month"
+            name="Enterprise"
+            price="Custom"
+            cadence="scoped to your team"
             points={[
-              'The same build, run by us',
-              'Managed Postgres, Redis, storage',
-              'Email and AI included',
+              'We set it up on your infrastructure',
+              'Custom integrations with your tools',
+              'SSO, SCIM, audit export and an SLA',
             ]}
-            cta={{ label: 'Start a trial', href: site.trial }}
+            cta={{ label: 'Contact us', href: site.contact }}
             featured
           />
         </div>
         <p data-reveal className="text-muted-foreground mt-6 text-center text-sm">
-          Need SAML, SCIM or audit export?{' '}
+          Not sure which fits?{' '}
           <Link
-            href="/pricing"
+            href="/pricing#enterprise"
             className="text-foreground underline decoration-white/20 underline-offset-4 hover:decoration-white/60"
           >
-            See Enterprise
+            See what Enterprise includes
           </Link>
         </p>
       </section>
@@ -340,11 +344,12 @@ export default function HomePage() {
             <span className="text-gradient-accent pr-1 font-serif font-normal italic">a team.</span>
           </h2>
           <p className="text-muted-foreground relative mx-auto mt-5 max-w-[46ch]">
-            Start on Cloud in minutes, or fork the repo and own every line.
+            Fork the repo and own every line, or tell us what your team needs and we will build it
+            out with you.
           </p>
           <div className="relative mt-9 flex flex-wrap justify-center gap-3">
-            <Link href={site.trial} className="btn-primary h-12 px-6">
-              Start free <Arrow className="h-4 w-4" />
+            <Link href={site.contact} className="btn-primary h-12 px-6">
+              Get in touch <Arrow className="h-4 w-4" />
             </Link>
             <a href={site.github} target="_blank" rel="noreferrer" className="btn-ghost h-12 px-6">
               <GitHubIcon className="h-4 w-4" /> Star on GitHub

@@ -54,8 +54,8 @@ export function SiteHeader() {
           >
             <GitHubIcon className="h-[18px] w-[18px]" />
           </a>
-          <Link href={site.trial} className="btn-primary h-10 px-4 text-[13px]">
-            Start free
+          <Link href={site.contact} className="btn-primary h-10 px-4 text-[13px]">
+            Get in touch
           </Link>
         </div>
       </div>
