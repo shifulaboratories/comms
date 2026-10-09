@@ -47,6 +47,11 @@ export interface UserPreferences {
   pinnedFirst?: boolean;
   /** Unpin automatically when a conversation is closed. */
   unpinOnDone?: boolean;
+  /**
+   * IANA time zone, e.g. `America/Los_Angeles`. Tells the AI what "today" is
+   * for you; unset falls back to the workspace's business-hours zone.
+   */
+  timeZone?: string;
 }
 
 /** Defaults applied when a user has never touched their settings. */
@@ -61,10 +66,13 @@ export const notificationDefaults = {
   // A pin is "deal with this"; closing it IS dealing with it, so the pin has
   // done its job. Off keeps pins as long-lived bookmarks instead.
   unpinOnDone: true,
-} satisfies Omit<Required<UserPreferences>, 'keymap' | 'signature'>;
+} satisfies Omit<Required<UserPreferences>, 'keymap' | 'signature' | 'timeZone'>;
 
-export type ResolvedPreferences = Omit<Required<UserPreferences>, 'keymap' | 'signature'> &
-  Pick<UserPreferences, 'keymap' | 'signature'>;
+export type ResolvedPreferences = Omit<
+  Required<UserPreferences>,
+  'keymap' | 'signature' | 'timeZone'
+> &
+  Pick<UserPreferences, 'keymap' | 'signature' | 'timeZone'>;
 
 /** Read a user's preferences with the defaults filled in for anything unset. */
 export function resolvePreferences(

@@ -15,6 +15,7 @@ import {
   Plus,
   UsersRound,
   X,
+  Brain,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -33,6 +34,7 @@ import { relativeTime } from '@/lib/format';
 import { formatAddress } from '@/lib/naming';
 import { PersonCard, type PersonCardProps } from '@/components/inbox/person-card';
 import { cn, initials } from '@/lib/utils';
+import { MemoryPanel, type MemoryData } from '@/components/inbox/memory-panel';
 
 const UNASSIGNED = '__unassigned__';
 
@@ -115,6 +117,7 @@ export function TicketPanel({
   contact,
   canManageTags = false,
   canRenameInbox = false,
+  memory,
 }: {
   conversation: {
     id: string;
@@ -149,6 +152,8 @@ export function TicketPanel({
   canManageTags?: boolean;
   /** inboxes.manage — renaming the number is an inbox-level act. */
   canRenameInbox?: boolean;
+  /** Facts and session summaries the AI keeps; omitted where AI is off. */
+  memory?: MemoryData;
   agents: { id: string; name: string | null; email: string }[];
   allTags: { id: string; name: string; color: string }[];
   ai?: { summary?: string; topic?: string; sentiment?: string } | null;
@@ -463,6 +468,12 @@ export function TicketPanel({
       {contact && (
         <Section label="Notes" icon={Pencil}>
           <ContactNotes contactId={contact.id} initial={contact.notes} />
+        </Section>
+      )}
+
+      {memory && (
+        <Section label="Memory" icon={Brain}>
+          <MemoryPanel contactId={contact?.id ?? null} memory={memory} />
         </Section>
       )}
 

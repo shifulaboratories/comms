@@ -28,12 +28,18 @@ export function ConfigTab({
     sendHourlyCap?: number;
     sendDailyCap?: number;
     sendMinIntervalMs?: number;
+    contextSessionGapHours?: number;
+    contextHalfLifeDays?: number;
+    contextLongGapDays?: number;
   };
   envDefaults: {
     undoSendSeconds: number;
     sendHourlyCap: number;
     sendDailyCap: number;
     sendMinIntervalMs: number;
+    contextSessionGapHours: number;
+    contextHalfLifeDays: number;
+    contextLongGapDays: number;
   };
   readOnlyConfig: { label: string; value: string; hint?: string }[];
   email: EmailStatus;
@@ -46,6 +52,9 @@ export function ConfigTab({
   const [hourly, setHourly] = useState(String(overrides.sendHourlyCap ?? ''));
   const [daily, setDaily] = useState(String(overrides.sendDailyCap ?? ''));
   const [interval, setIntervalMs] = useState(String(overrides.sendMinIntervalMs ?? ''));
+  const [sessionGap, setSessionGap] = useState(String(overrides.contextSessionGapHours ?? ''));
+  const [halfLife, setHalfLife] = useState(String(overrides.contextHalfLifeDays ?? ''));
+  const [longGap, setLongGap] = useState(String(overrides.contextLongGapDays ?? ''));
 
   // Email settings — seeded from whatever is effective today.
   const [host, setHost] = useState(email.settings?.host ?? '');
@@ -63,6 +72,9 @@ export function ConfigTab({
         sendHourlyCap: num(hourly),
         sendDailyCap: num(daily),
         sendMinIntervalMs: num(interval),
+        contextSessionGapHours: num(sessionGap),
+        contextHalfLifeDays: num(halfLife),
+        contextLongGapDays: num(longGap),
       });
       if (res.ok) {
         toast.success('Saved — applies within seconds, no redeploy');
@@ -302,6 +314,59 @@ export function ConfigTab({
           </p>
           <Button size="sm" onClick={saveConfig} loading={pending}>
             Save runtime settings
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* ---- AI context ---- */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">AI context</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-[12px] leading-relaxed text-muted-foreground">
+            How the AI weighs a thread&apos;s history. Only the current session is read word for
+            word; older sessions fade by age and are kept as short summaries, and a long silence is
+            flagged so old plans aren&apos;t treated as current. Personal texting usually wants a
+            shorter half-life than a support inbox.
+          </p>
+          <div className="grid gap-2.5 sm:grid-cols-3">
+            <div className="space-y-1.5">
+              <Label className="text-[12px]">New session after (hours quiet)</Label>
+              <Input
+                type="number"
+                min={1}
+                max={72}
+                value={sessionGap}
+                onChange={(e) => setSessionGap(e.target.value)}
+                placeholder={String(envDefaults.contextSessionGapHours)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[12px]">History half-life (days)</Label>
+              <Input
+                type="number"
+                min={1}
+                max={365}
+                value={halfLife}
+                onChange={(e) => setHalfLife(e.target.value)}
+                placeholder={String(envDefaults.contextHalfLifeDays)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[12px]">Flag silences longer than (days)</Label>
+              <Input
+                type="number"
+                min={1}
+                max={365}
+                value={longGap}
+                onChange={(e) => setLongGap(e.target.value)}
+                placeholder={String(envDefaults.contextLongGapDays)}
+              />
+            </div>
+          </div>
+          <Button size="sm" onClick={saveConfig} loading={pending}>
+            Save AI context settings
           </Button>
         </CardContent>
       </Card>

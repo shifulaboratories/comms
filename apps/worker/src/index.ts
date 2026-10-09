@@ -10,7 +10,7 @@ import {
 } from '@comms/core';
 import { getDb, closeDb, ensureAppSecret } from '@comms/db';
 import { channelConnections } from '@comms/db';
-import { isAiConfigured } from '@comms/ai';
+import { isAiConfigured, isEmbeddingsConfigured } from '@comms/ai';
 import { processInbound } from './processors/inbound.js';
 import { processOutbound } from './processors/outbound.js';
 import { processAttachment } from './processors/attachments.js';
@@ -102,6 +102,16 @@ async function main() {
       // (env key or a provider connected in the admin panel).
       if ((await isAiConfigured()) && (await due('bundle', 60 * 60))) {
         await enqueueAi({ type: 'bundle' });
+      }
+      // Long-term memory: summarize sessions that have gone quiet. Each
+      // thread is only revisited after it has new messages, so this is cheap
+      // once the backlog is through.
+      if ((await isAiConfigured()) && (await due('memorySweep', 15 * 60))) {
+        await enqueueAi({ type: 'memorySweep' });
+      }
+      // Vectors for meaning-based search, when an embeddings key is set.
+      if (isEmbeddingsConfigured() && (await due('embed', 5 * 60))) {
+        await enqueueAi({ type: 'embed' });
       }
       const conns = await getDb()
         .select({ id: channelConnections.id })

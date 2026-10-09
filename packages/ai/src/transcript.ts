@@ -1,4 +1,6 @@
 export interface TranscriptMessage {
+  /** The message's id, when known — lets callers attach per-message scores. */
+  id?: string;
   role: 'contact' | 'agent' | 'note' | 'system';
   author?: string | null;
   text: string;

@@ -13,6 +13,7 @@ import {
   getIntroContext,
   getGroupParticipants,
   myPinnedConversationIds,
+  getMemory,
 } from '@/server/queries';
 import { getSetting } from '@/server/settings';
 import { resolveSignature } from '@/server/signature';
@@ -59,6 +60,7 @@ export default async function ConversationPage({
     signature,
     participants,
     pinnedIds,
+    memory,
   ] = await Promise.all([
     getMessages(conversationId),
     listAgents(),
@@ -75,6 +77,7 @@ export default async function ConversationPage({
     resolveSignature(user.id, conversation.inboxId),
     conversation.isGroup ? getGroupParticipants(conversationId) : Promise.resolve([]),
     myPinnedConversationIds(user.id),
+    getMemory(conversationId, conversation.isGroup ? null : conversation.contactId),
   ]);
 
   // Tapbacks, typing indicators and edits all require the BlueBubbles Private
@@ -253,6 +256,7 @@ export default async function ConversationPage({
                 }
                 canManageTags={can(user, 'workspace.manage')}
                 canRenameInbox={can(user, 'inboxes.manage')}
+                memory={aiEnabled ? memory : undefined}
                 person={{
                   name: contactName,
                   avatarUrl: conversation.contact?.avatarUrl ?? null,

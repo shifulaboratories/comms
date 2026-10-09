@@ -54,12 +54,18 @@ export interface AdminPanelProps {
     sendHourlyCap?: number;
     sendDailyCap?: number;
     sendMinIntervalMs?: number;
+    contextSessionGapHours?: number;
+    contextHalfLifeDays?: number;
+    contextLongGapDays?: number;
   };
   envDefaults: {
     undoSendSeconds: number;
     sendHourlyCap: number;
     sendDailyCap: number;
     sendMinIntervalMs: number;
+    contextSessionGapHours: number;
+    contextHalfLifeDays: number;
+    contextLongGapDays: number;
   };
   readOnlyConfig: { label: string; value: string; hint?: string }[];
   suggestedModels: Record<string, string>;

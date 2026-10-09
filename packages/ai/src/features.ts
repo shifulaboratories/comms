@@ -1,7 +1,10 @@
 import type Anthropic from '@anthropic-ai/sdk';
 import { aiStructured, aiText } from './client.js';
 import { RECENT_MARKER, ageLabel, type TranscriptMessage } from './transcript.js';
-import { CONTEXT_HEADINGS, formatContext } from './context.js';
+import { CONTEXT_HEADINGS, formatContext, todayLine, type ContextOptions } from './context.js';
+
+/** Memory, time zone and tuning to pass through to {@link formatContext}. */
+export type ContextInput = Omit<ContextOptions, 'now' | 'recentCount'>;
 
 /**
  * How many trailing messages count as "the conversation you are in", as
@@ -22,7 +25,7 @@ export const RECENT_WINDOW = 10;
  */
 const RECENCY_RULES = [
   `The context starts with today's date. "${CONTEXT_HEADINGS.current}" is the live exchange, verbatim, oldest to newest; lines like [3 weeks ago] mark how old the messages beneath them are, and everything below "${RECENT_MARKER}" is the most recent part of it.`,
-  `"${CONTEXT_HEADINGS.earlier}" is a condensed digest of older sessions and "${CONTEXT_HEADINGS.recalled}" holds older lines that mention the same things as the live exchange. Both are background: use them only when the live exchange actually depends on them.`,
+  `"${CONTEXT_HEADINGS.profile}" lists what is known about the person, "${CONTEXT_HEADINGS.earlier}" is a condensed digest of older sessions and "${CONTEXT_HEADINGS.recalled}" holds older lines that mention the same things as the live exchange. All three are background: use them only when the live exchange actually depends on them, and never recite them back.`,
   "Reply to the LAST message. That is what is on the other person's mind; everything above it is background.",
   'Old messages describe a situation that has probably already resolved — plans were carried out, questions were answered, problems were fixed, people moved, things got bought. Never treat something raised weeks or months ago as still open or still pending unless the recent messages show that it is.',
   'Where old and recent context conflict, the recent context is the truth. Do not reintroduce old topics, old logistics or old questions.',
@@ -38,6 +41,7 @@ export async function summarizeConversation(input: {
   contactName?: string | null;
   messages: TranscriptMessage[];
   now?: Date;
+  context?: ContextInput;
 }): Promise<string> {
   return aiText({
     maxTokens: 600,
@@ -46,7 +50,8 @@ export async function summarizeConversation(input: {
       `The context starts with today's date; "${CONTEXT_HEADINGS.current}" is the live exchange and the sections above it are condensed or recalled history. Age markers like [3 months ago] tell you what is stale; settled history is not worth a sentence. If the thread was silent for a long time before the live exchange, say so briefly rather than presenting old plans as current.`,
     ].join(' '),
     user:
-      formatContext(input.messages, input.contactName, { now: input.now }) || 'No messages yet.',
+      formatContext(input.messages, input.contactName, { ...input.context, now: input.now }) ||
+      'No messages yet.',
   });
 }
 
@@ -57,9 +62,11 @@ export async function suggestReply(input: {
   brandVoiceExamples?: string[];
   guidance?: string;
   now?: Date;
+  context?: ContextInput;
 }): Promise<string> {
   const parts = [
     formatContext(input.messages, input.contactName, {
+      ...input.context,
       now: input.now,
       recentCount: RECENT_WINDOW,
     }) || 'No messages yet.',
@@ -100,12 +107,14 @@ export async function improveDraft(input: {
   brandVoiceExamples?: string[];
   guidance?: string;
   now?: Date;
+  context?: ContextInput;
 }): Promise<string> {
   const draft = input.draft.trim();
   if (!draft) return '';
 
   const parts = [
     formatContext(input.messages, input.contactName, {
+      ...input.context,
       now: input.now,
       recentCount: RECENT_WINDOW,
     }) || 'No messages yet.',
@@ -182,12 +191,14 @@ export async function triageConversation(input: {
   contactName?: string | null;
   messages: TranscriptMessage[];
   now?: Date;
+  context?: ContextInput;
 }): Promise<ConversationTriage> {
   const data = (await aiStructured({
     maxTokens: 600,
     system: `You triage inbound customer-support conversations. Classify accurately and concisely. Judge the conversation by where it stands now, not by how it began: "${CONTEXT_HEADINGS.current}" is the live exchange, the sections above it are older history, and a thread that was urgent months ago is not urgent today unless the recent messages say so.`,
     user: `Triage this conversation:\n\n${
-      formatContext(input.messages, input.contactName, { now: input.now }) || 'No messages yet.'
+      formatContext(input.messages, input.contactName, { ...input.context, now: input.now }) ||
+      'No messages yet.'
     }`,
     tool: TRIAGE_TOOL,
   })) as Partial<ConversationTriage>;
@@ -340,6 +351,7 @@ export async function answerFromArchive(input: {
   question: string;
   excerpts: ArchiveExcerpt[];
   now?: Date;
+  timeZone?: string | null;
 }): Promise<ArchiveAnswer> {
   if (input.excerpts.length === 0) {
     return {
@@ -370,7 +382,7 @@ export async function answerFromArchive(input: {
       'If the excerpts do not contain the answer, say so plainly and say what you did find instead — never fill the gap from general knowledge, and never guess at a number, date, price or commitment.',
       'Cite the excerpts you used inline as [1], [2]. Quote short fragments where the exact wording matters.',
       'Be direct and brief. No preamble, no restating the question.',
-      `Today is ${now.toUTCString().slice(0, 16)}. Excerpts carry their date and age. When excerpts disagree, the most recent one wins — plans change, addresses move, prices update — and say that it changed if it matters. If the most recent relevant excerpt is months old, say how old it is, since things may have moved on outside these messages.`,
+      `${todayLine(now, input.timeZone)} Excerpts carry their date and age. When excerpts disagree, the most recent one wins — plans change, addresses move, prices update — and say that it changed if it matters. If the most recent relevant excerpt is months old, say how old it is, since things may have moved on outside these messages.`,
     ].join(' '),
     user: `Question: ${input.question}\n\nExcerpts from my messages:\n\n${context}`,
   });
@@ -395,6 +407,7 @@ export async function completeMessage(input: {
   messages: TranscriptMessage[];
   prefix: string;
   now?: Date;
+  context?: ContextInput;
 }): Promise<string> {
   const out = await aiText({
     maxTokens: 60,
@@ -409,6 +422,7 @@ export async function completeMessage(input: {
     ].join(' '),
     user: `${
       formatContext(input.messages, input.contactName, {
+        ...input.context,
         now: input.now,
         recentCount: RECENT_WINDOW,
       }) || 'No messages yet.'

@@ -12,4 +12,5 @@ export * from './query.js';
 export * from './views.js';
 export * from './system.js';
 export * from './ai.js';
+export * from './memory.js';
 export * from './relations.js';
