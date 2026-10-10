@@ -13,3 +13,4 @@ export * from './correspondent.js';
 export * from './media.js';
 export * from './transcribe.js';
 export * from './bluebubbles/index.js';
+export * from './webhooks.js';

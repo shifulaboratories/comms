@@ -215,6 +215,16 @@ For the richest feature set (reactions, typing indicators, edit/unsend, read rec
 BlueBubbles **Private API** on the Mac. Comms automatically falls back to basic mode if it isn't
 available.
 
+## Integrations
+
+Connect Comms to the tools around it from **Settings → Integrations**:
+
+- **Claude, ChatGPT and any MCP client.** Comms runs an MCP server at `/api/mcp`, so an assistant can search, read and — if you allow it — reply, add notes and triage, acting as you.
+- **Twenty CRM.** The Comms app for Twenty adds an iMessage tab to every person and keeps "last texted" fields up to date ([`integrations/twenty`](integrations/twenty/README.md)).
+- **REST API and webhooks** for everything else.
+
+Details: [docs/integrations.md](docs/integrations.md).
+
 ## Architecture
 
 A pnpm monorepo, one Docker image, two runtime roles:

@@ -8,6 +8,7 @@ import {
   Building2,
   Inbox,
   Keyboard,
+  Plug,
   Radio,
   ShieldCheck,
   Sparkles,
@@ -45,6 +46,7 @@ const GROUPS: { title: string; items: NavItem[] }[] = [
       { href: '/settings/inbox', label: 'Inbox', icon: Inbox },
       { href: '/settings/preferences', label: 'Preferences', icon: Bell },
       { href: '/settings/keyboard', label: 'Shortcuts', icon: Keyboard },
+      { href: '/settings/integrations', label: 'Integrations', icon: Plug },
     ],
   },
   {

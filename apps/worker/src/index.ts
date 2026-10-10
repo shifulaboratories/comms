@@ -16,6 +16,7 @@ import { processOutbound } from './processors/outbound.js';
 import { processAttachment } from './processors/attachments.js';
 import { processMaintenance } from './processors/maintenance.js';
 import { processAiJob } from './processors/ai.js';
+import { processWebhook } from './processors/webhooks.js';
 
 const log = logger.child({ service: 'worker' });
 
@@ -48,6 +49,10 @@ async function main() {
     new Worker(QUEUE_NAMES.ai, processAiJob, {
       connection: createRedis(),
       concurrency: 3,
+    }),
+    new Worker(QUEUE_NAMES.webhooks, processWebhook, {
+      connection: createRedis(),
+      concurrency: 5,
     }),
   ];
 

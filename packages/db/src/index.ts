@@ -34,3 +34,4 @@ export {
   count,
   countDistinct,
 } from 'drizzle-orm';
+export * from './public-api.js';

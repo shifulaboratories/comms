@@ -19,6 +19,7 @@ import {
   enqueueAttachment,
   enqueueAiForConversation,
   publishEvent,
+  emitWebhook,
   logger,
 } from '@comms/core';
 import { isAiConfigured } from '@comms/ai';
@@ -234,6 +235,9 @@ async function ingestAttachments(connectionId: string, messageId: string, bb: BB
  *  2. Our own outbound echo (isFromMe + matching tempGuid) → reconcile the row.
  *  3. A message sent from the Mac/iPhone outside Comms (isFromMe, no tempGuid) → external.
  */
+/** How recent a message must be to count as live traffic for webhooks. */
+const LIVE_WINDOW_MS = 15 * 60 * 1000;
+
 export async function ingestNewMessage(connectionId: string, bb: BBMessage): Promise<void> {
   const db = getDb();
 
@@ -443,6 +447,14 @@ export async function ingestNewMessage(connectionId: string, bb: BBMessage): Pro
     inboxId: conn.inboxId,
     messageId: msg.id,
   });
+
+  // Outbound webhooks hear about live traffic only. Backfill and history
+  // re-syncs run through here too, and replaying a year of texts into a
+  // CRM as if they had just arrived would be worse than sending nothing.
+  if (!reaction && Date.now() - sentAt.getTime() < LIVE_WINDOW_MS) {
+    if (created) await emitWebhook('conversation.created', { conversationId: conversation.id });
+    await emitWebhook(isInbound ? 'message.received' : 'message.sent', { messageId: msg.id });
+  }
   await publishEvent({
     type: 'conversation.updated',
     conversationId: conversation.id,

@@ -4,6 +4,7 @@ import {
   type BBSendMethod,
   getObjectBytes,
   publishEvent,
+  emitWebhook,
   awaitSendSlot,
   takeSendQuota,
   diagnoseConnectionError,
@@ -160,6 +161,7 @@ export async function processOutbound(job: Job<OutboundJob>, token?: string): Pr
           error: null,
         })
         .where(eq(messages.id, msg.id));
+      await emitWebhook('message.sent', { messageId: msg.id });
 
       // Optionally clear the unread badge / send a read receipt on reply.
       const inboxSettings = (

@@ -8,6 +8,7 @@ export const QUEUE_NAMES = {
   attachments: 'comms-attachments',
   maintenance: 'comms-maintenance',
   ai: 'comms-ai',
+  webhooks: 'comms-webhooks',
 } as const;
 
 export type QueueName = (typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES];
@@ -59,6 +60,30 @@ export type MaintenanceJob =
   | { type: 'seedDefaultFolders' };
 
 /**
+ * Outbound webhooks. `emit` fans an event out to every endpoint subscribed to
+ * it; `deliver` is one POST to one endpoint, retried with backoff on failure.
+ * The payload is built at delivery time from ids, so a retry carries current
+ * data and the queue never holds message text longer than it has to.
+ */
+export type WebhookJob =
+  | {
+      type: 'emit';
+      event: string;
+      /** Ids the payload is built from. */
+      ref: { messageId?: string; conversationId?: string };
+      occurredAt: number;
+      eventId: string;
+    }
+  | {
+      type: 'deliver';
+      endpointId: string;
+      event: string;
+      ref: { messageId?: string; conversationId?: string };
+      occurredAt: number;
+      eventId: string;
+    };
+
+/**
  * Background AI work. `precompute` prepares the draft reply and catch-up
  * summary so both are already waiting when an agent opens the conversation —
  * the difference between "click and wait" and Tab-to-accept. `triage` keeps
@@ -107,6 +132,28 @@ export const outboundQueue = () => getQueue<OutboundJob>(QUEUE_NAMES.outbound);
 export const attachmentsQueue = () => getQueue<AttachmentJob>(QUEUE_NAMES.attachments);
 export const maintenanceQueue = () => getQueue<MaintenanceJob>(QUEUE_NAMES.maintenance);
 export const aiQueue = () => getQueue<AiJob>(QUEUE_NAMES.ai);
+export const webhooksQueue = () => getQueue<WebhookJob>(QUEUE_NAMES.webhooks);
+
+/**
+ * Announce an event to outbound webhooks. Cheap and safe to call from any hot
+ * path: it only enqueues, and a Redis hiccup never fails the caller.
+ */
+export async function emitWebhook(
+  event: string,
+  ref: { messageId?: string; conversationId?: string },
+): Promise<void> {
+  const eventId = `evt_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
+  await webhooksQueue()
+    .add(
+      'emit',
+      { type: 'emit', event, ref, occurredAt: Date.now(), eventId },
+      {
+        removeOnComplete: 1000,
+        removeOnFail: 1000,
+      },
+    )
+    .catch(() => {});
+}
 
 export async function enqueueInbound(job: InboundJob, opts?: JobsOptions) {
   return inboundQueue().add('inbound', job, opts);

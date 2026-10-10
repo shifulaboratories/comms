@@ -14,3 +14,4 @@ export * from './system.js';
 export * from './ai.js';
 export * from './memory.js';
 export * from './relations.js';
+export * from './integrations.js';
